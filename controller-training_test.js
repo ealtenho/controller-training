@@ -11,13 +11,15 @@ describe('controller training', function() {
     });
 
 
-    it('should patch the functions of Element.prototype to call handleManipulation()', function() {
-      spyOn(controllerTrainer, 'handleManipulation');
-      controllerTrainer.addManipulationListener();
-      expect(controllerTrainer.handleManipulation).not.toHaveBeenCalled();
+    it('should patch the functions of Element.prototype to call the givenFunction param', function() {
+      var testObj = {};
+      testObj.testFunction = function(){};
+      spyOn(testObj, 'testFunction');
+      controllerTrainer.addManipulationListener(testObj.testFunction);
+      expect(testObj.testFunction).not.toHaveBeenCalled();
       var element = document.createElement('a');
       element.getAttribute('NamedNodeMap');
-      expect(controllerTrainer.handleManipulation).toHaveBeenCalled();
+      expect(testObj.testFunction).toHaveBeenCalled();
       controllerTrainer.removeManipulationListener();
     });
   });

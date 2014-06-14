@@ -10,13 +10,13 @@ collectProperties = function() {
 var originalProperties = collectProperties();
 
 var controllerTrainer = {
-  addManipulationListener: function() {
+  addManipulationListener: function(givenFunction) {
     var objectProperties = Object.getOwnPropertyNames(Element.prototype);
     objectProperties.forEach(function(prop) {
       var original = Element.prototype[prop];
       if(typeof original === 'function') {
         Element.prototype[prop] = function () {
-          controllerTrainer.handleManipulation();
+          givenFunction();''
           return original.apply(this, arguments);
         };
       }
