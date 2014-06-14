@@ -16,8 +16,18 @@ var controllerTrainer = {
       var original = Element.prototype[prop];
       if(typeof original === 'function') {
         Element.prototype[prop] = function () {
-          givenFunction();''
+          givenFunction();
           return original.apply(this, arguments);
+        };
+      }
+    });
+    var nodeProperties = Object.getOwnPropertyNames(Node.prototype);
+    nodeProperties.forEach(function(prop) {
+      var originalNode = Node.prototype[prop];
+      if(typeof originalNode === 'function') {
+        Node.prototype[prop] = function () {
+          givenFunction();
+          return originalNode.apply(this, arguments);
         };
       }
     });
