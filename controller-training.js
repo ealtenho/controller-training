@@ -1,3 +1,13 @@
+collectProperties = function() {
+    var objectProperties = {};
+    var objectPropertyNames = Object.getOwnPropertyNames(Element.prototype);
+    objectPropertyNames.forEach(function(prop) {
+      objectProperties[prop] = Element.prototype[prop];
+    });
+    return objectProperties;
+};
+
+var originalProperties = collectProperties();
 
 var controllerTrainer = {
   addManipulationListener: function() {
@@ -7,14 +17,22 @@ var controllerTrainer = {
       if(typeof original === 'function') {
         Element.prototype[prop] = function () {
           controllerTrainer.handleManipulation();
-          return original.apply(Element.prototype, arguments);
+          return original.apply(this, arguments);
         };
       }
     });
   },
-
   handleManipulation: function() {
     return 'Manipulation Handled';
+  },
+  removeManipulationListener: function() {
+    var objectProperties = Object.getOwnPropertyNames(Element.prototype);
+    objectProperties.forEach(function(prop) {
+      var alteredElement = Element.prototype[prop];
+      if(typeof alteredElement === 'function') {
+        Element.prototype[prop] = originalProperties[prop];
+      }
+    });
   }
 };
 
