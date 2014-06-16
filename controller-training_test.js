@@ -1,5 +1,13 @@
 describe('controller training', function() {
-  describe('addManipulationListener()', function() {
+  describe('patchProperties()', function() {
+    it('should return an array properties from DOM elements to patch', function() {
+      var testProperty = 'innerHTML';
+      var patchProperties = controllerTrainer.patchProperties;
+      expect(patchProperties.indexOf(testProperty)).not.toBe(-1);
+    });
+  });
+
+  ddescribe('addManipulationListener()', function() {
     it('should patch the functions of Element.prototype', function() {
       var objectProperties = Object.getOwnPropertyNames(Element.prototype);
       var testProperty = objectProperties[0];
@@ -30,19 +38,32 @@ describe('controller training', function() {
       controllerTrainer.removeManipulationListener();
     });
 
-    it('should patch the functions of Element.prototype to call the givenFunction param', function() {
-      var testObj = {};
-      testObj.testFunction = function(){
-        return 'test function';
+    it('should patch properties of standard HTML elements', function() {
+      var patchProperties = controllerTrainer.patchProperties;
+      var testObj0 = {};
+        testObj0.testFunction = function(){
+          return 'test function';
       };
-      spyOn(testObj, 'testFunction');
-      controllerTrainer.addManipulationListener(testObj.testFunction);
-      expect(testObj.testFunction).not.toHaveBeenCalled();
-      var element = document.createElement('a');
-      element.getAttribute('NamedNodeMap');
-      expect(testObj.testFunction).toHaveBeenCalled();
+      expect(Element.prototype[patchProperties[0]]).toBeUndefined();
+      controllerTrainer.addManipulationListener(testObj0.testFunction);
+      expect(Element.prototype[patchProperties[0]]).not.toBeUndefined();
       controllerTrainer.removeManipulationListener();
     });
+
+    it('should patch the functions of Element.prototype to call the givenFunction param',
+      function() {
+        var testObj = {};
+        testObj.testFunction = function(){
+          return 'test function';
+        };
+        spyOn(testObj, 'testFunction');
+        controllerTrainer.addManipulationListener(testObj.testFunction);
+        expect(testObj.testFunction).not.toHaveBeenCalled();
+        var element = document.createElement('a');
+        element.getAttribute('NamedNodeMap');
+        expect(testObj.testFunction).toHaveBeenCalled();
+        controllerTrainer.removeManipulationListener();
+      });
 
 
     it('should detect getting element.innerHTML', function() {
@@ -52,7 +73,7 @@ describe('controller training', function() {
       controllerTrainer.addManipulationListener(testObj2.testFunction);
       expect(testObj2.testFunction).not.toHaveBeenCalled();
       var element = document.createElement('div');
-      var inner = element.innerHTML;
+      var inner = element['innerHTML'];
       expect(testObj2.testFunction).toHaveBeenCalled();
       controllerTrainer.removeManipulationListener();
     });
@@ -150,19 +171,55 @@ describe('controller training', function() {
   });
   describe('removeManipulationListener()', function() {
     it('should remove the patch from functions on Element.prototype', function() {
+      var mockObject = {};
+      mockObject.testFunction = function(){};
       var objectProperties = Object.getOwnPropertyNames(Element.prototype);
       var testProperty = objectProperties[0];
       var originalFunction = Element.prototype[testProperty];
       expect(Element.prototype[testProperty]).toBe(originalFunction);
-      controllerTrainer.addManipulationListener();
+      controllerTrainer.addManipulationListener(mockObject.testFunction);
       expect(Element.prototype[testProperty]).not.toBe(originalFunction);
       controllerTrainer.removeManipulationListener();
       expect(Element.prototype[testProperty]).toBe(originalFunction);
     });
-  });
-  describe('patchProperties()', function() {
-    it('should return an array of DOM elements and their relevant properties', function() {
 
+    it('should remove the patch from functions on Node.prototype', function() {
+      var mockObject2 = {};
+      mockObject2.testFunction = function(){};
+      var objectProperties = Object.getOwnPropertyNames(Node.prototype);
+      var testProperty = objectProperties[0];
+      var originalFunction = Node.prototype[testProperty];
+      expect(Node.prototype[testProperty]).toBe(originalFunction);
+      controllerTrainer.addManipulationListener(mockObject2.testFunction);
+      expect(Node.prototype[testProperty]).not.toBe(originalFunction);
+      controllerTrainer.removeManipulationListener();
+      expect(Node.prototype[testProperty]).toBe(originalFunction);
+    });
+
+    it('should remove the patch from functions on EventTarget.prototype', function() {
+      var mockObject3 = {};
+      mockObject3.testFunction = function(){};
+      var objectProperties = Object.getOwnPropertyNames(EventTarget.prototype);
+      var testProperty = objectProperties[0];
+      var originalFunction = EventTarget.prototype[testProperty];
+      expect(EventTarget.prototype[testProperty]).toBe(originalFunction);
+      controllerTrainer.addManipulationListener(mockObject3.testFunction);
+      expect(EventTarget.prototype[testProperty]).not.toBe(originalFunction);
+      controllerTrainer.removeManipulationListener();
+      expect(EventTarget.prototype[testProperty]).toBe(originalFunction);
+    });
+
+    it('should remove the patch from HTML properties', function() {
+      var testingObject = {};
+      testingObject.testFunction = function(){};
+      var testDiv = document.createElement('div');
+      var patchProperties = Object.getOwnPropertyNames(testDiv);
+      testProperty = patchProperties[0];
+      expect(Element.prototype[testProperty]).toBeUndefined();
+      controllerTrainer.addManipulationListener(testingObject.testFunction);
+      expect(Element.prototype[testProperty]).not.toBeUndefined();
+      controllerTrainer.removeManipulationListener();
+      expect(Element.prototype[testProperty]).toBeUndefined();
     });
   });
 });

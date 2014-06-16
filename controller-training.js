@@ -1,5 +1,7 @@
 patchProperties = function() {
-
+  var testDiv = document.createElement('div');
+  var patchProperties = Object.getOwnPropertyNames(testDiv);
+  return patchProperties;
 };
 
 collectProperties = function() {
@@ -32,8 +34,10 @@ collectPropertiesEventTarget = function() {
 var originalProperties = collectProperties();
 var originalPropertiesNode = collectPropertiesNode();
 var originalPropertiesEventTarget = collectPropertiesEventTarget();
+var calculatePatchProperties = patchProperties();
 
 var controllerTrainer = {
+  patchProperties: calculatePatchProperties,
   addManipulationListener: function(givenFunction) {
     var objectProperties = Object.getOwnPropertyNames(Element.prototype);
     objectProperties.forEach(function(prop) {
@@ -65,9 +69,19 @@ var controllerTrainer = {
         };
       }
     });
-  },
-  handleManipulation: function() {
-    return 'Manipulation Handled';
+    this.patchProperties.forEach(function(prop) {
+        Object.defineProperty(Element.prototype, prop, {
+          configurable: true,
+          get: function() {
+            givenFunction();
+            return value;
+          },
+          set: function(newValue) {
+            givenFunction();
+            value = newValue;
+          }
+        });
+    });
   },
   removeManipulationListener: function() {
     var objectProperties = Object.getOwnPropertyNames(Element.prototype);
@@ -92,6 +106,10 @@ var controllerTrainer = {
       if(typeof alteredElementEventTarget === 'function') {
         EventTarget.prototype[prop] = originalPropertiesEventTarget[prop];
       }
+    });
+
+    this.patchProperties.forEach(function(prop) {
+      delete Element.prototype[prop];
     });
   }
 };
