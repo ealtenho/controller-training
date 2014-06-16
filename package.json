@@ -11,8 +11,7 @@
     "karma-coverage": "~0.1.4"
   },
   "scripts": {
-    "test": "./node_modules/.bin/karma start --browsers Firefox --single-run",
-    "test": "karma start"
+    "test": "./node_modules/.bin/karma start --browsers Firefox --single-run"
   },
   "repository": {
     "type": "git",
