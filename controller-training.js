@@ -1,10 +1,25 @@
-patchProperties = function() {
-  var testDiv = document.createElement('div');
-  var patchProperties = Object.getOwnPropertyNames(testDiv);
-  return patchProperties;
-};
 
-collectProperties = function() {
+var patchMaker = {
+  patchProperties: function(element, listener) {
+  properties = ['innerHTML', 'parentElement'];
+
+  properties.forEach(function(prop) {
+        Object.defineProperty(element, prop, {
+          configurable: true,
+          get: function() {
+            listener();
+            return element.value;
+          },
+          set: function(newValue) {
+            listener();
+            element.value = newValue;
+          }
+        });
+    });
+  }
+}
+
+var collectProperties = function() {
     var objectProperties = {};
     var objectPropertyNames = Object.getOwnPropertyNames(Element.prototype);
     objectPropertyNames.forEach(function(prop) {
@@ -13,7 +28,7 @@ collectProperties = function() {
     return objectProperties;
 };
 
-collectPropertiesNode = function() {
+var collectPropertiesNode = function() {
     var objectProperties = {};
     var objectPropertyNames = Object.getOwnPropertyNames(Node.prototype);
     objectPropertyNames.forEach(function(prop) {
@@ -22,7 +37,7 @@ collectPropertiesNode = function() {
     return objectProperties;
 };
 
-collectPropertiesEventTarget = function() {
+var collectPropertiesEventTarget = function() {
     var objectProperties = {};
     var objectPropertyNames = Object.getOwnPropertyNames(EventTarget.prototype);
     objectPropertyNames.forEach(function(prop) {
@@ -34,10 +49,10 @@ collectPropertiesEventTarget = function() {
 var originalProperties = collectProperties();
 var originalPropertiesNode = collectPropertiesNode();
 var originalPropertiesEventTarget = collectPropertiesEventTarget();
-var calculatePatchProperties = patchProperties();
+//var calculatePatchProperties = patchProperties();
 
 var controllerTrainer = {
-  patchProperties: calculatePatchProperties,
+  //patchProperties: calculatePatchProperties,
   addManipulationListener: function(givenFunction) {
     var objectProperties = Object.getOwnPropertyNames(Element.prototype);
     objectProperties.forEach(function(prop) {
@@ -69,19 +84,6 @@ var controllerTrainer = {
         };
       }
     });
-    this.patchProperties.forEach(function(prop) {
-        Object.defineProperty(Element.prototype, prop, {
-          configurable: true,
-          get: function() {
-            givenFunction();
-            return value;
-          },
-          set: function(newValue) {
-            givenFunction();
-            value = newValue;
-          }
-        });
-    });
   },
   removeManipulationListener: function() {
     var objectProperties = Object.getOwnPropertyNames(Element.prototype);
@@ -108,9 +110,9 @@ var controllerTrainer = {
       }
     });
 
-    this.patchProperties.forEach(function(prop) {
-      delete Element.prototype[prop];
-    });
+    // this.patchProperties.forEach(function(prop) {
+    //   delete Element.prototype[prop];
+    // });
   }
 };
 

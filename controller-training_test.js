@@ -1,13 +1,19 @@
 describe('controller training', function() {
   describe('patchProperties()', function() {
-    it('should return an array properties from DOM elements to patch', function() {
+    it('should patch target properties of created HTML objects', function() {
       var testProperty = 'innerHTML';
-      var patchProperties = controllerTrainer.patchProperties;
-      expect(patchProperties.indexOf(testProperty)).not.toBe(-1);
+      var testProperty2 = 'parentElement';
+      var testingFunction = function() {
+        return 'testing';
+      };
+      var element = document.createElement('a');
+      expect(element[testProperty]).toBe('');
+      patchMaker.patchProperties(element, testingFunction);
+      expect(element[testProperty]).not.toBe('');
     });
   });
 
-  ddescribe('addManipulationListener()', function() {
+  describe('addManipulationListener()', function() {
     it('should patch the functions of Element.prototype', function() {
       var objectProperties = Object.getOwnPropertyNames(Element.prototype);
       var testProperty = objectProperties[0];
@@ -38,41 +44,14 @@ describe('controller training', function() {
       controllerTrainer.removeManipulationListener();
     });
 
-    it('should patch properties of standard HTML elements', function() {
-      var patchProperties = controllerTrainer.patchProperties;
-      var testObj0 = {};
-        testObj0.testFunction = function(){
-          return 'test function';
-      };
-      expect(Element.prototype[patchProperties[0]]).toBeUndefined();
-      controllerTrainer.addManipulationListener(testObj0.testFunction);
-      expect(Element.prototype[patchProperties[0]]).not.toBeUndefined();
-      controllerTrainer.removeManipulationListener();
-    });
-
-    it('should patch the functions of Element.prototype to call the givenFunction param',
-      function() {
-        var testObj = {};
-        testObj.testFunction = function(){
-          return 'test function';
-        };
-        spyOn(testObj, 'testFunction');
-        controllerTrainer.addManipulationListener(testObj.testFunction);
-        expect(testObj.testFunction).not.toHaveBeenCalled();
-        var element = document.createElement('a');
-        element.getAttribute('NamedNodeMap');
-        expect(testObj.testFunction).toHaveBeenCalled();
-        controllerTrainer.removeManipulationListener();
-      });
-
 
     it('should detect getting element.innerHTML', function() {
       var testObj2 = {};
       testObj2.testFunction = function(){};
       spyOn(testObj2, 'testFunction');
-      controllerTrainer.addManipulationListener(testObj2.testFunction);
       expect(testObj2.testFunction).not.toHaveBeenCalled();
       var element = document.createElement('div');
+      patchMaker.patchProperties(element, testObj2.testFunction);
       var inner = element['innerHTML'];
       expect(testObj2.testFunction).toHaveBeenCalled();
       controllerTrainer.removeManipulationListener();
@@ -83,9 +62,9 @@ describe('controller training', function() {
       var testObj3 = {};
       testObj3.testFunction = function(){};
       spyOn(testObj3, 'testFunction');
-      controllerTrainer.addManipulationListener(testObj3.testFunction);
       expect(testObj3.testFunction).not.toHaveBeenCalled();
       var element = document.createElement('div');
+      patchMaker.patchProperties(element, testObj3.testFunction);
       element.innerHTML = 'blank';
       expect(testObj3.testFunction).toHaveBeenCalled();
       controllerTrainer.removeManipulationListener();
@@ -96,9 +75,9 @@ describe('controller training', function() {
       var testObj4 = {};
       testObj4.testFunction = function(){};
       spyOn(testObj4, 'testFunction');
-      controllerTrainer.addManipulationListener(testObj4.testFunction);
       expect(testObj4.testFunction).not.toHaveBeenCalled();
       var element = document.createElement('div');
+      patchMaker.patchProperties(element, testObj4.testFunction);
       var parent = element.parentElement;
       expect(testObj4.testFunction).toHaveBeenCalled();
       controllerTrainer.removeManipulationListener();
@@ -209,17 +188,17 @@ describe('controller training', function() {
       expect(EventTarget.prototype[testProperty]).toBe(originalFunction);
     });
 
-    it('should remove the patch from HTML properties', function() {
-      var testingObject = {};
-      testingObject.testFunction = function(){};
-      var testDiv = document.createElement('div');
-      var patchProperties = Object.getOwnPropertyNames(testDiv);
-      testProperty = patchProperties[0];
-      expect(Element.prototype[testProperty]).toBeUndefined();
-      controllerTrainer.addManipulationListener(testingObject.testFunction);
-      expect(Element.prototype[testProperty]).not.toBeUndefined();
-      controllerTrainer.removeManipulationListener();
-      expect(Element.prototype[testProperty]).toBeUndefined();
-    });
+    // it('should remove the patch from HTML properties', function() {
+    //   var testingObject = {};
+    //   testingObject.testFunction = function(){};
+    //   var testDiv = document.createElement('div');
+    //   var patchProperties = Object.getOwnPropertyNames(testDiv);
+    //   testProperty = patchProperties[0];
+    //   expect(Element.prototype[testProperty]).toBeUndefined();
+    //   controllerTrainer.addManipulationListener(testingObject.testFunction);
+    //   expect(Element.prototype[testProperty]).not.toBeUndefined();
+    //   controllerTrainer.removeManipulationListener();
+    //   expect(Element.prototype[testProperty]).toBeUndefined();
+    // });
   });
 });
