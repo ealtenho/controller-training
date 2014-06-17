@@ -1,8 +1,9 @@
 describe('controller application', function() {
   var $controller;
   beforeEach(module('controllerApp'));
-  beforeEach(inject(function(_$controller_) {
+  beforeEach(inject(function(_$controller_, _$timeout_) {
     $controller = _$controller_;
+    $timeout = _$timeout_;
   }));
   describe('controller decorating', function() {
     it('should maintain normal controller logic', function() {
@@ -14,15 +15,19 @@ describe('controller application', function() {
       expect(ctrl).toBeDefined();
     });
 
+
     it('should call logic to patch prototypes', function() {
       spyOn(prototypePatcher, 'addManipulationListener');
       expect(prototypePatcher.addManipulationListener).not.toHaveBeenCalled();
+      spyOn(listener, 'testFunction');
+      expect(listener.testFunction).not.toHaveBeenCalled();
       var controllerMock = function() {
         var element = document.createElement('a');
         element.innerHTML = 'testValue';
       };
       var ctrl = $controller(controllerMock);
       expect(prototypePatcher.addManipulationListener).toHaveBeenCalled();
+      expect(listener.testFunction).toHaveBeenCalled();
     });
 
 
@@ -35,6 +40,20 @@ describe('controller application', function() {
       };
       var ctrl = $controller(controllerMock);
       expect(prototypePatcher.removeManipulationListener).toHaveBeenCalled();
+    });
+
+
+    it('should handle asynchronous DOM manipulations', function() {
+      spyOn(listener, 'testFunction');
+      expect(listener.testFunction).not.toHaveBeenCalled();
+      var controllerMock = function() {
+        $timeout(function() {
+          var element = document.createElement('a');
+          element.innerHTML = 'testValue';
+        });
+      };
+      var ctrl = $controller(controllerMock);
+      expect(listener.testFunction).toHaveBeenCalled();
     });
   });
 

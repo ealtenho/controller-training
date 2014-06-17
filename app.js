@@ -86,14 +86,14 @@ angular.module('controllerApp', []).
         originalProperties: collectProperties(),
         originalPropertiesNode: collectPropertiesNode(),
         originalPropertiesEventTarget: collectPropertiesEventTarget(),
-        addManipulationListener: function(givenFunction) {
+        addManipulationListener: function(listener) {
           var objectProperties = Object.getOwnPropertyNames(Element.prototype);
           objectProperties.forEach(function(prop) {
             try {
               var original = Element.prototype[prop];
               if(typeof original === 'function') {
                 Element.prototype[prop] = function () {
-                  givenFunction();
+                  listener();
                   return original.apply(this, arguments);
                 };
               }
@@ -110,7 +110,7 @@ angular.module('controllerApp', []).
             var originalNode = Node.prototype[prop];
               if(typeof originalNode === 'function') {
                 Node.prototype[prop] = function () {
-                  givenFunction();
+                  listener();
                   return originalNode.apply(this, arguments);
                 };
               }
@@ -125,7 +125,7 @@ angular.module('controllerApp', []).
             var originalEventTarget = EventTarget.prototype[prop];
             if(typeof originalEventTarget === 'function') {
               EventTarget.prototype[prop] = function () {
-                givenFunction();
+                listener();
                 return originalEventTarget.apply(this, arguments);
               };
             }
@@ -170,17 +170,15 @@ angular.module('controllerApp', []).
         }
       }
 
-    function patch () {
-
-      var testFunction = function() {
+    this.listener = {
+      testFunction: function() {
         return 'DOM Manipulation detected';
       }
-      prototypePatcher.addManipulationListener(testFunction);
-    };
+    }
 
     $provide.decorator('$controller', function($delegate) {
       return function () {
-        patch();
+        prototypePatcher.addManipulationListener(listener.testFunction);
         var controller = $delegate.apply(this, arguments);
         prototypePatcher.removeManipulationListener();
         return controller;
