@@ -91,7 +91,7 @@ describe('controller training', function() {
       controllerTrainer.addManipulationListener(testObj5.testFunction);
       expect(testObj5.testFunction).not.toHaveBeenCalled();
       var element = document.createElement('div');
-      var parent = element.addEventListener('onclick', function(e){});
+      var parent = element.addEventListener('click', function(e){});
       expect(testObj5.testFunction).toHaveBeenCalled();
       controllerTrainer.removeManipulationListener();
     });

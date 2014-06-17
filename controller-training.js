@@ -27,6 +27,7 @@ var collectProperties = function() {
         objectProperties[prop] = Element.prototype[prop];
       }
       catch(e) {
+        dump('Access ' + prop + ' on Element');
         dump(e);
       }
     });
@@ -41,6 +42,7 @@ var collectPropertiesNode = function() {
         objectProperties[prop] = Node.prototype[prop];
       }
       catch(e) {
+        dump('Access ' + prop + ' on Node');
         dump(e);
       }
     });
@@ -55,6 +57,7 @@ var collectPropertiesEventTarget = function() {
         objectProperties[prop] = EventTarget.prototype[prop];
       }
       catch(e) {
+        dump('Access ' + prop + ' on EventTarget');
         dump(e);
       }
     });
@@ -81,6 +84,7 @@ var controllerTrainer = {
         }
       }
       catch(e){
+        dump('Access ' + prop + ' on Element');
         dump(e);
       }
 
@@ -97,6 +101,7 @@ var controllerTrainer = {
         }
       }
       catch(e) {
+        dump('Access ' + prop + ' on Node');
         dump(e);
       }
     });
@@ -121,6 +126,7 @@ var controllerTrainer = {
        }
       }
       catch(e) {
+        dump('Access ' + prop + ' on Element');
         dump(e);
       }
     });
@@ -134,6 +140,7 @@ var controllerTrainer = {
       }
     }
     catch(e) {
+      dump('Access ' + prop + ' on Node');
       dump(e);
     }
     });
