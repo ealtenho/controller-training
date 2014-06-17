@@ -5,8 +5,10 @@ module.exports = function(config) {
   config.set({
     frameworks: ['jasmine'],
     files: [
-      'controller-training.js',
-      'controller-training_test.js'
+      'bower_components/angular/angular.js',
+      'bower_components/angular-mocks/angular-mocks.js',
+      'app.js',
+      'app_test.js'
     ],
     exclude: [
     ],

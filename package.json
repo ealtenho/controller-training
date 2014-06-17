@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/ealtenho/controller-training/issues"
   },
-  "homepage": "https://github.com/ealtenho/controller-training"
+  "homepage": "https://github.com/ealtenho/controller-training",
+  "dependencies": {
+    "angular": "^1.2.16"
+  }
 }
