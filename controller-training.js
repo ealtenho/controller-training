@@ -23,7 +23,12 @@ var collectProperties = function() {
     var objectProperties = {};
     var objectPropertyNames = Object.getOwnPropertyNames(Element.prototype);
     objectPropertyNames.forEach(function(prop) {
-      objectProperties[prop] = Element.prototype[prop];
+      try {
+        objectProperties[prop] = Element.prototype[prop];
+      }
+      catch(e) {
+        dump(e);
+      }
     });
     return objectProperties;
 };
@@ -32,7 +37,12 @@ var collectPropertiesNode = function() {
     var objectProperties = {};
     var objectPropertyNames = Object.getOwnPropertyNames(Node.prototype);
     objectPropertyNames.forEach(function(prop) {
-      objectProperties[prop] = Node.prototype[prop];
+      try {
+        objectProperties[prop] = Node.prototype[prop];
+      }
+      catch(e) {
+        dump(e);
+      }
     });
     return objectProperties;
 };
@@ -41,7 +51,12 @@ var collectPropertiesEventTarget = function() {
     var objectProperties = {};
     var objectPropertyNames = Object.getOwnPropertyNames(EventTarget.prototype);
     objectPropertyNames.forEach(function(prop) {
-      objectProperties[prop] = EventTarget.prototype[prop];
+      try {
+        objectProperties[prop] = EventTarget.prototype[prop];
+      }
+      catch(e) {
+        dump(e);
+      }
     });
     return objectProperties;
 };
@@ -56,22 +71,33 @@ var controllerTrainer = {
   addManipulationListener: function(givenFunction) {
     var objectProperties = Object.getOwnPropertyNames(Element.prototype);
     objectProperties.forEach(function(prop) {
-      var original = Element.prototype[prop];
-      if(typeof original === 'function') {
-        Element.prototype[prop] = function () {
-          givenFunction();
-          return original.apply(this, arguments);
-        };
+      try {
+        var original = Element.prototype[prop];
+        if(typeof original === 'function') {
+          Element.prototype[prop] = function () {
+            givenFunction();
+            return original.apply(this, arguments);
+          };
+        }
       }
+      catch(e){
+        dump(e);
+      }
+
     });
     var nodeProperties = Object.getOwnPropertyNames(Node.prototype);
     nodeProperties.forEach(function(prop) {
+      try {
       var originalNode = Node.prototype[prop];
-      if(typeof originalNode === 'function') {
-        Node.prototype[prop] = function () {
-          givenFunction();
-          return originalNode.apply(this, arguments);
-        };
+        if(typeof originalNode === 'function') {
+          Node.prototype[prop] = function () {
+            givenFunction();
+            return originalNode.apply(this, arguments);
+          };
+        }
+      }
+      catch(e) {
+        dump(e);
       }
     });
     var eventTargetProperties = Object.getOwnPropertyNames(EventTarget.prototype);
@@ -88,18 +114,28 @@ var controllerTrainer = {
   removeManipulationListener: function() {
     var objectProperties = Object.getOwnPropertyNames(Element.prototype);
     objectProperties.forEach(function(prop) {
+      try{
       var alteredElement = Element.prototype[prop];
-      if(typeof alteredElement === 'function') {
-        Element.prototype[prop] = originalProperties[prop];
+        if(typeof alteredElement === 'function') {
+          Element.prototype[prop] = originalProperties[prop];
+       }
+      }
+      catch(e) {
+        dump(e);
       }
     });
 
     var objectPropertiesNode = Object.getOwnPropertyNames(Node.prototype);
     objectPropertiesNode.forEach(function(prop) {
+    try{
       var alteredElementNode = Node.prototype[prop];
       if(typeof alteredElementNode === 'function') {
         Node.prototype[prop] = originalPropertiesNode[prop];
       }
+    }
+    catch(e) {
+      dump(e);
+    }
     });
 
     var objectPropertiesEventTarget = Object.getOwnPropertyNames(EventTarget.prototype);
