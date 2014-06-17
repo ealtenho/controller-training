@@ -4,7 +4,10 @@
   "description": "app for angular best practice help",
   "main": "controller-training.js",
   "devDependencies": {
-   "karma": "~0.8"
+    "karma": "0.12.16",
+    "karma-jasmine": "0.1.5",
+    "karma-firefox-launcher": "~0.1.0",
+    "karma-coverage": "~0.1.4"
   },
   "scripts": {
     "test": "./node_modules/.bin/karma start --browsers Firefox --single-run"
