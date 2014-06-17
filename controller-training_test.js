@@ -12,6 +12,21 @@ describe('controller training', function() {
       expect(element[testProperty]).not.toBe('');
     });
   });
+  describe('upPatch()', function() {
+    it('should unpatch target properties patched on HTML objects', function() {
+      var testProperty = 'innerHTML';
+      var testProperty2 = 'parentElement';
+      var testingFunction = function() {
+        return 'testing';
+      };
+      var element = document.createElement('a');
+      expect(element[testProperty]).toBe('');
+      patchMaker.patchProperties(element, testingFunction);
+      expect(element[testProperty]).not.toBe('');
+      patchMaker.unPatch(element);
+      expect(element[testProperty]).toBe('');
+    });
+  });
 
   describe('addManipulationListener()', function() {
     it('should patch the functions of Element.prototype', function() {
@@ -187,18 +202,5 @@ describe('controller training', function() {
       controllerTrainer.removeManipulationListener();
       expect(EventTarget.prototype[testProperty]).toBe(originalFunction);
     });
-
-    // it('should remove the patch from HTML properties', function() {
-    //   var testingObject = {};
-    //   testingObject.testFunction = function(){};
-    //   var testDiv = document.createElement('div');
-    //   var patchProperties = Object.getOwnPropertyNames(testDiv);
-    //   testProperty = patchProperties[0];
-    //   expect(Element.prototype[testProperty]).toBeUndefined();
-    //   controllerTrainer.addManipulationListener(testingObject.testFunction);
-    //   expect(Element.prototype[testProperty]).not.toBeUndefined();
-    //   controllerTrainer.removeManipulationListener();
-    //   expect(Element.prototype[testProperty]).toBeUndefined();
-    // });
   });
 });

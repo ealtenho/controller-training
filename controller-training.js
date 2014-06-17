@@ -1,18 +1,35 @@
 
 var patchMaker = {
+  savedProperties: {},
+  saveProp: function(element, prop) {
+    this.savedProperties[prop] = element[prop];
+  },
+  properties: ['innerHTML', 'parentElement'],
   patchProperties: function(element, listener) {
-  properties = ['innerHTML', 'parentElement'];
-
-  properties.forEach(function(prop) {
+  this.properties.forEach(function(prop) {
+        patchMaker.saveProp(element, prop);
         Object.defineProperty(element, prop, {
           configurable: true,
           get: function() {
             listener();
-            return element.value;
+            return element.prop;
           },
           set: function(newValue) {
             listener();
-            element.value = newValue;
+            element.prop = newValue;
+          }
+        });
+    });
+  },
+  unPatch: function(element) {
+    this.properties.forEach(function(prop) {
+    Object.defineProperty(element, prop, {
+          configurable: true,
+          get: function() {
+            return patchMaker.savedProperties[prop];
+          },
+          set: function(newValue) {
+            element.prop = newValue;
           }
         });
     });
@@ -152,10 +169,6 @@ var controllerTrainer = {
         EventTarget.prototype[prop] = originalPropertiesEventTarget[prop];
       }
     });
-
-    // this.patchProperties.forEach(function(prop) {
-    //   delete Element.prototype[prop];
-    // });
   }
 };
 
