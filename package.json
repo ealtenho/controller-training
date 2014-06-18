@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/ealtenho/controller-training",
   "dependencies": {
-    "angular": "^1.2.16"
+    "angular": "^1.2.16",
+    "zone.js": "^0.3.0"
   }
 }
