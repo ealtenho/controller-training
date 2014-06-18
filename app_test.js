@@ -1,11 +1,14 @@
 describe('controller application', function() {
-  var $controller, $timeout, $rootScope;
+  var $controller, $rootScope, $timeout;
   beforeEach(module('controllerApp'));
-  beforeEach(inject(function(_$controller_, _$timeout_, _$rootScope_) {
+  beforeEach(module('$timeout'));
+  beforeEach(inject(function(_$controller_, _$rootScope_, _$timeout_) {
     $controller = _$controller_;
-    $timeout = _$timeout_;
     $rootScope = _$rootScope_;
+    $timeout = _$timeout_;
   }));
+
+
   describe('controller decorating', function() {
     it('should maintain normal controller logic', function() {
       var controllerMock = function() {
@@ -54,18 +57,24 @@ describe('controller application', function() {
 
 
     iit('should handle asynchronous DOM manipulations', inject(function($rootScope) {
+      dump($timeout);
       spyOn(patchServices, 'listener');
       expect(patchServices.listener).not.toHaveBeenCalled();
-      var controllerMock = function() {
-        $timeout(function() {
-          dump('hi');
-          var element = document.createElement('a');
-          element.innerHTML = 'testValue';
-        });
-      };
-      var ctrl = $controller(controllerMock);
-      $timeout.flush();
+      runs(function() {
+        var controllerMock = function() {
+            $timeout(function() {
+              dump('Running');
+              var element = document.createElement('a');
+              element.innerHTML = 'testValue';
+            }, 250);
+          };
+        var ctrl = $controller(controllerMock);
+      });
       $rootScope.$apply();
+      waitsFor(function() {
+
+      }, 'controller execution', 1000);
+
 
       expect(patchServices.listener).toHaveBeenCalled();
     }));
