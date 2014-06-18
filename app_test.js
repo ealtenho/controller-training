@@ -56,7 +56,7 @@ describe('controller application', function() {
     });
 
 
-    iit('should handle asynchronous DOM manipulations', inject(function($rootScope) {
+    it('should handle asynchronous DOM manipulations', inject(function($rootScope) {
       dump($timeout);
       spyOn(patchServices, 'listener');
       expect(patchServices.listener).not.toHaveBeenCalled();

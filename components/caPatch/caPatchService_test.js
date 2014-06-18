@@ -2,7 +2,6 @@ describe('patchServices', function() {
     describe('patchProperties()', function() {
       it('should patch target properties of created HTML objects', function() {
         var testProperty = 'innerHTML';
-        var testProperty2 = 'parentElement';
         var testingFunction = function() {
           return 'testing';
         };
@@ -10,6 +9,24 @@ describe('patchServices', function() {
         expect(element[testProperty]).toBe('');
         patchServices.patchMaker.patchProperties(element, testingFunction);
         expect(element[testProperty]).not.toBe('');
+      });
+
+      it('should preserve the functionality of DOM APIS that are patched', function() {
+        var testProperty = 'innerHTML';
+        var testObject = {};
+        testObject.testingFunction = function() {
+          return 'testing';
+        };
+        var element = document.createElement('a');
+        expect(element[testProperty]).toBe('');
+        spyOn(testObject, 'testingFunction');
+        patchServices.patchMaker.patchProperties(element, testObject.testingFunction);
+        element[testProperty] = 'Testing Value';
+        expect(element[testProperty]).toBe('Testing Value');
+        testObject.testingFunction.reset();
+        expect(testObject.testingFunction).not.toHaveBeenCalled();
+        element[testProperty] = 'Another Value';
+        expect(testObject.testingFunction).toHaveBeenCalled();
       });
     });
     describe('unPatch()', function() {
