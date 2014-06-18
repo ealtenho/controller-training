@@ -5,6 +5,7 @@ node_js:
   - 0.10
 before_script:
   - npm install -g bower
-  - bower install
+  - bower install angular
+  - bower install angular-mocks
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
