@@ -86,14 +86,14 @@ patchServices.prototypePatcher = {
       originalProperties: patchServices.collectProperties(),
       originalPropertiesNode: patchServices.collectPropertiesNode(),
       originalPropertiesEventTarget: patchServices.collectPropertiesEventTarget(),
-      addManipulationListener: function(givenFunction) {
+      addManipulationListener: function(listener) {
         var objectProperties = Object.getOwnPropertyNames(Element.prototype);
         objectProperties.forEach(function(prop) {
           try {
             var original = Element.prototype[prop];
             if(typeof original === 'function') {
               Element.prototype[prop] = function () {
-                givenFunction();
+                listener();
                 return original.apply(this, arguments);
               };
             }
@@ -110,7 +110,7 @@ patchServices.prototypePatcher = {
           var originalNode = Node.prototype[prop];
             if(typeof originalNode === 'function') {
               Node.prototype[prop] = function () {
-                givenFunction();
+                listener();
                 return originalNode.apply(this, arguments);
               };
             }
@@ -125,7 +125,7 @@ patchServices.prototypePatcher = {
           var originalEventTarget = EventTarget.prototype[prop];
           if(typeof originalEventTarget === 'function') {
             EventTarget.prototype[prop] = function () {
-              givenFunction();
+              listener();
               return originalEventTarget.apply(this, arguments);
             };
           }
@@ -169,4 +169,8 @@ patchServices.prototypePatcher = {
         });
       }
     };
+
+    patchServices.listener = function() {
+        return 'DOM Manipulation detected';
+      };
 

@@ -59,6 +59,19 @@ describe('patch services', function() {
         patchServices.prototypePatcher.removeManipulationListener();
       });
 
+      it('should patch the prototype functions to call the listener param', function() {
+        var testFunctionObject = {};
+        testFunctionObject.testingFunction = function(){
+            return 'DOM manipulation detected';
+        }
+        spyOn(testFunctionObject, 'testingFunction');
+        expect(testFunctionObject.testingFunction).not.toHaveBeenCalled();
+        patchServices.prototypePatcher.addManipulationListener(testFunctionObject.testingFunction);
+        var element = document.createElement('a');
+        element.getAttribute('NamedNodeMap');
+        expect(testFunctionObject.testingFunction).toHaveBeenCalled();
+        patchServices.prototypePatcher.removeManipulationListener();
+      });
 
       it('should detect getting element.innerHTML', function() {
         var testObj2 = {};

@@ -17,17 +17,14 @@ describe('controller application', function() {
 
 
     it('should call logic to patch prototypes', function() {
-      spyOn(patchServices.prototypePatcher, 'addManipulationListener');
-      expect(patchServices.prototypePatcher.addManipulationListener).not.toHaveBeenCalled();
-      spyOn(listener, 'testFunction');
-      expect(listener.testFunction).not.toHaveBeenCalled();
+      spyOn(patchServices, 'listener');
+      expect(patchServices.listener).not.toHaveBeenCalled();
       var controllerMock = function() {
         var element = document.createElement('a');
-        element.innerHTML = 'testValue';
+        element.getAttribute('NamedNodeMap');
       };
       var ctrl = $controller(controllerMock);
-      expect(patchServices.prototypePatcher.addManipulationListener).toHaveBeenCalled();
-      expect(listener.testFunction).toHaveBeenCalled();
+      expect(patchServices.listener).toHaveBeenCalled();
     });
 
 
@@ -44,8 +41,8 @@ describe('controller application', function() {
 
 
     it('should handle asynchronous DOM manipulations', function() {
-      spyOn(listener, 'testFunction');
-      expect(listener.testFunction).not.toHaveBeenCalled();
+      spyOn(patchServices, 'listener');
+      expect(patchServices.listener).not.toHaveBeenCalled();
       var controllerMock = function() {
         $timeout(function() {
           var element = document.createElement('a');
@@ -53,7 +50,7 @@ describe('controller application', function() {
         });
       };
       var ctrl = $controller(controllerMock);
-      expect(listener.testFunction).toHaveBeenCalled();
+      expect(patchServices.listener).toHaveBeenCalled();
     });
   });
 });
