@@ -1,9 +1,10 @@
 describe('controller application', function() {
-  var $controller;
+  var $controller, $timeout, $rootScope;
   beforeEach(module('controllerApp'));
-  beforeEach(inject(function(_$controller_, _$timeout_) {
+  beforeEach(inject(function(_$controller_, _$timeout_, _$rootScope_) {
     $controller = _$controller_;
     $timeout = _$timeout_;
+    $rootScope = _$rootScope_;
   }));
   describe('controller decorating', function() {
     it('should maintain normal controller logic', function() {
@@ -52,17 +53,21 @@ describe('controller application', function() {
     });
 
 
-    it('should handle asynchronous DOM manipulations', function() {
+    iit('should handle asynchronous DOM manipulations', inject(function($rootScope) {
       spyOn(patchServices, 'listener');
       expect(patchServices.listener).not.toHaveBeenCalled();
       var controllerMock = function() {
         $timeout(function() {
+          dump('hi');
           var element = document.createElement('a');
           element.innerHTML = 'testValue';
         });
       };
       var ctrl = $controller(controllerMock);
+      $timeout.flush();
+      $rootScope.$apply();
+
       expect(patchServices.listener).toHaveBeenCalled();
-    });
+    }));
   });
 });
