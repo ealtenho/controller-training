@@ -28,6 +28,18 @@ describe('controller application', function() {
     });
 
 
+    it('should call logic to patch created elements', function() {
+      spyOn(patchServices, 'listener');
+      expect(patchServices.listener).not.toHaveBeenCalled();
+      var controllerMock = function() {
+        var element = document.createElement('a');
+        element.innerHTML = 'test';
+      };
+      var ctrl = $controller(controllerMock);
+      expect(patchServices.listener).toHaveBeenCalled();
+    });
+
+
     it('should unpatch prototypes after execution', function() {
       spyOn(patchServices.prototypePatcher, 'removeManipulationListener');
       expect(patchServices.prototypePatcher.removeManipulationListener).not.toHaveBeenCalled();

@@ -1,4 +1,4 @@
-describe('patch services', function() {
+describe('patchServices', function() {
     describe('patchProperties()', function() {
       it('should patch target properties of created HTML objects', function() {
         var testProperty = 'innerHTML';
@@ -214,5 +214,39 @@ describe('patch services', function() {
         patchServices.prototypePatcher.removeManipulationListener();
         expect(EventTarget.prototype[testProperty]).toBe(originalFunction);
       });
+    });
+    describe('detectCreation()', function() {
+        it('should detect the creation of HTML elements and call appropriate patching', function() {
+            patchServices.detectCreation(patchServices.listener);
+            spyOn(patchServices.patchMaker, 'patchProperties');
+            expect(patchServices.patchMaker.patchProperties).not.toHaveBeenCalled();
+            var element = document.createElement('a');
+            expect(patchServices.patchMaker.patchProperties).toHaveBeenCalled();
+            patchServices.undetectCreation();
+        });
+
+        it('should patch those HTML elements with a listener', function() {
+            var mockTestingObj = {};
+            mockTestingObj.mockTest = function() {
+                dump('Manipulation detected');
+            }
+            spyOn(mockTestingObj, 'mockTest');
+            patchServices.detectCreation(mockTestingObj.mockTest);
+            var element = document.createElement('a');
+            expect(mockTestingObj.mockTest).not.toHaveBeenCalled();
+            element.innerHTML = 'test';
+            expect(mockTestingObj.mockTest).toHaveBeenCalled();
+            patchServices.patchMaker.unPatch(element);
+            patchServices.undetectCreation();
+        });
+    });
+    describe('undetectCreation()', function() {
+        it('should remove the patching of document.createElement', function() {
+            var createElement = document['createElement'];
+            patchServices.detectCreation(patchServices.listener);
+            expect(createElement).not.toBe(document['createElement']);
+            patchServices.undetectCreation();
+            expect(createElement).toBe(document['createElement']);
+        });
     });
   });

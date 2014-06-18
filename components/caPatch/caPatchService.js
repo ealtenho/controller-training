@@ -45,6 +45,19 @@ patchServices.collectPropertiesEventTarget = function() {
       return objectProperties;
     };
 
+patchServices.originalCreateElement = document['createElement'];
+
+patchServices.detectCreation = function(listener) {
+  var original = document['createElement'];
+  document['createElement'] = function(param) {
+    return patchServices.patchMaker.patchProperties(original.apply(this,arguments), listener);
+  }
+};
+
+patchServices.undetectCreation = function() {
+  document['createElement'] = patchServices.originalCreateElement;
+};
+
 patchServices.patchMaker = {
       savedProperties: {},
       saveProp: function(element, prop) {
@@ -52,7 +65,7 @@ patchServices.patchMaker = {
       },
       properties: ['innerHTML', 'parentElement'],
       patchProperties: function(element, listener) {
-      this.properties.forEach(function(prop) {
+        this.properties.forEach(function(prop) {
             patchServices.patchMaker.saveProp(element, prop);
             Object.defineProperty(element, prop, {
               configurable: true,
@@ -66,6 +79,7 @@ patchServices.patchMaker = {
               }
             });
         });
+        return element;
       },
       unPatch: function(element) {
         this.properties.forEach(function(prop) {
