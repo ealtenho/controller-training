@@ -1,6 +1,51 @@
-angular.module('caPatch').
-  service('caPatchService', function() {
-    var patchMaker = {
+var patchServices = {};
+
+patchServices.collectProperties = function() {
+      var objectProperties = {};
+      var objectPropertyNames = Object.getOwnPropertyNames(Element.prototype);
+      objectPropertyNames.forEach(function(prop) {
+        try {
+          objectProperties[prop] = Element.prototype[prop];
+        }
+        catch(e) {
+          dump('Access ' + prop + ' on Element');
+          dump(e);
+        }
+      });
+      return objectProperties;
+    };
+
+patchServices.collectPropertiesNode = function() {
+      var objectProperties = {};
+      var objectPropertyNames = Object.getOwnPropertyNames(Node.prototype);
+      objectPropertyNames.forEach(function(prop) {
+        try {
+          objectProperties[prop] = Node.prototype[prop];
+        }
+        catch(e) {
+          dump('Access ' + prop + ' on Node');
+          dump(e);
+        }
+      });
+      return objectProperties;
+    };
+
+patchServices.collectPropertiesEventTarget = function() {
+      var objectProperties = {};
+      var objectPropertyNames = Object.getOwnPropertyNames(EventTarget.prototype);
+      objectPropertyNames.forEach(function(prop) {
+        try {
+          objectProperties[prop] = EventTarget.prototype[prop];
+        }
+        catch(e) {
+          dump('Access ' + prop + ' on EventTarget');
+          dump(e);
+        }
+      });
+      return objectProperties;
+    };
+
+patchServices.patchMaker = {
       savedProperties: {},
       saveProp: function(element, prop) {
         this.savedProperties[prop] = element[prop];
@@ -8,7 +53,7 @@ angular.module('caPatch').
       properties: ['innerHTML', 'parentElement'],
       patchProperties: function(element, listener) {
       this.properties.forEach(function(prop) {
-            patchMaker.saveProp(element, prop);
+            patchServices.patchMaker.saveProp(element, prop);
             Object.defineProperty(element, prop, {
               configurable: true,
               get: function() {
@@ -27,7 +72,7 @@ angular.module('caPatch').
         Object.defineProperty(element, prop, {
               configurable: true,
               get: function() {
-                return patchMaker.savedProperties[prop];
+                return patchServices.patchMaker.savedProperties[prop];
               },
               set: function(newValue) {
                 element.prop = newValue;
@@ -37,56 +82,10 @@ angular.module('caPatch').
       }
     }
 
-    var collectProperties = function() {
-      var objectProperties = {};
-      var objectPropertyNames = Object.getOwnPropertyNames(Element.prototype);
-      objectPropertyNames.forEach(function(prop) {
-        try {
-          objectProperties[prop] = Element.prototype[prop];
-        }
-        catch(e) {
-          dump('Access ' + prop + ' on Element');
-          dump(e);
-        }
-      });
-      return objectProperties;
-    };
-
-    var collectPropertiesNode = function() {
-      var objectProperties = {};
-      var objectPropertyNames = Object.getOwnPropertyNames(Node.prototype);
-      objectPropertyNames.forEach(function(prop) {
-        try {
-          objectProperties[prop] = Node.prototype[prop];
-        }
-        catch(e) {
-          dump('Access ' + prop + ' on Node');
-          dump(e);
-        }
-      });
-      return objectProperties;
-    };
-
-    var collectPropertiesEventTarget = function() {
-      var objectProperties = {};
-      var objectPropertyNames = Object.getOwnPropertyNames(EventTarget.prototype);
-      objectPropertyNames.forEach(function(prop) {
-        try {
-          objectProperties[prop] = EventTarget.prototype[prop];
-        }
-        catch(e) {
-          dump('Access ' + prop + ' on EventTarget');
-          dump(e);
-        }
-      });
-      return objectProperties;
-    };
-
-    var originalProperties = collectProperties();
-    var originalPropertiesNode = collectPropertiesNode();
-    var originalPropertiesEventTarget = collectPropertiesEventTarget();
-
-    var controllerTrainer = {
+patchServices.prototypePatcher = {
+      originalProperties: patchServices.collectProperties(),
+      originalPropertiesNode: patchServices.collectPropertiesNode(),
+      originalPropertiesEventTarget: patchServices.collectPropertiesEventTarget(),
       addManipulationListener: function(givenFunction) {
         var objectProperties = Object.getOwnPropertyNames(Element.prototype);
         objectProperties.forEach(function(prop) {
@@ -138,7 +137,7 @@ angular.module('caPatch').
           try{
           var alteredElement = Element.prototype[prop];
             if(typeof alteredElement === 'function') {
-              Element.prototype[prop] = originalProperties[prop];
+              Element.prototype[prop] = patchServices.prototypePatcher.originalProperties[prop];
            }
           }
           catch(e) {
@@ -152,7 +151,7 @@ angular.module('caPatch').
         try{
           var alteredElementNode = Node.prototype[prop];
           if(typeof alteredElementNode === 'function') {
-            Node.prototype[prop] = originalPropertiesNode[prop];
+            Node.prototype[prop] = patchServices.prototypePatcher.originalPropertiesNode[prop];
           }
         }
         catch(e) {
@@ -165,10 +164,9 @@ angular.module('caPatch').
         objectPropertiesEventTarget.forEach(function(prop) {
           var alteredElementEventTarget = EventTarget.prototype[prop];
           if(typeof alteredElementEventTarget === 'function') {
-            EventTarget.prototype[prop] = originalPropertiesEventTarget[prop];
+            EventTarget.prototype[prop] = patchServices.prototypePatcher.originalPropertiesEventTarget[prop];
           }
         });
       }
     };
-  }
 
