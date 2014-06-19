@@ -1,11 +1,10 @@
 describe('controller application', function() {
-  var $controller, $rootScope, $timeout;
+  var $controller, $rootScope;
   beforeEach(module('controllerApp'));
   beforeEach(module('$timeout'));
-  beforeEach(inject(function(_$controller_, _$rootScope_, _$timeout_) {
+  beforeEach(inject(function(_$controller_, _$rootScope_) {
     $controller = _$controller_;
     $rootScope = _$rootScope_;
-    $timeout = _$timeout_;
   }));
 
 
@@ -57,26 +56,29 @@ describe('controller application', function() {
 
 
     it('should handle asynchronous DOM manipulations', inject(function($rootScope) {
-      dump($timeout);
-      spyOn(patchServices, 'listener');
-      expect(patchServices.listener).not.toHaveBeenCalled();
+      var timeoutCompleted = false;
+
       runs(function() {
-        var controllerMock = function() {
+        spyOn(patchServices, 'listener');
+        expect(patchServices.listener).not.toHaveBeenCalled();
+        var controllerMock = function($timeout) {
             $timeout(function() {
-              dump('Running');
               var element = document.createElement('a');
               element.innerHTML = 'testValue';
-            }, 250);
+              timeoutCompleted = true;
+            }, 0);
           };
         var ctrl = $controller(controllerMock);
+        $rootScope.$apply();
       });
-      $rootScope.$apply();
+
       waitsFor(function() {
+        return timeoutCompleted;
+      }, 'controller execution', 100);
 
-      }, 'controller execution', 1000);
-
-
-      expect(patchServices.listener).toHaveBeenCalled();
+      runs(function() {
+        expect(patchServices.listener).toHaveBeenCalled();
+      });
     }));
   });
 });
