@@ -6,13 +6,11 @@ angular.module('controllerApp', []).
       var controllerZone = zone.fork({
         beforeTask: function() {
           dump('before');
-          patchServices.prototypePatcher.addManipulationListener(patchServices.listener);
-          patchServices.detectCreation(patchServices.listener);
+          patchServices.addManipulationListener(patchServices.listener);
         },
         afterTask: function() {
           dump('after');
-          patchServices.prototypePatcher.removeManipulationListener(patchServices.listener);
-          patchServices.undetectCreation();
+          patchServices.removeManipulationListener();
         }
       });
       return controllerZone.bind($delegate);

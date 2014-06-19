@@ -1,4 +1,4 @@
-ddescribe('patchServices', function() {
+describe('patchServices', function() {
     describe('patchProperties()', function() {
       it('should patch target properties of created HTML objects', function() {
         var testProperty = 'innerHTML';
@@ -7,7 +7,7 @@ ddescribe('patchServices', function() {
         };
         var element = document.createElement('a');
         expect(element[testProperty]).toBe('');
-        patchServices.patchMaker.patchProperties(element, testingFunction);
+        patchServices.patchElementProperties(element, testingFunction);
         expect(element[testProperty]).not.toBe('');
       });
 
@@ -20,7 +20,7 @@ ddescribe('patchServices', function() {
         var element = document.createElement('a');
         expect(element[testProperty]).toBe('');
         spyOn(testObject, 'testingFunction');
-        patchServices.patchMaker.patchProperties(element, testObject.testingFunction);
+        patchServices.patchElementProperties(element, testObject.testingFunction);
         element[testProperty] = 'Testing Value';
         expect(element[testProperty]).toBe('Testing Value');
         testObject.testingFunction.reset();
@@ -29,18 +29,17 @@ ddescribe('patchServices', function() {
         expect(testObject.testingFunction).toHaveBeenCalled();
       });
     });
-    describe('unPatch()', function() {
+    describe('unpatchElementProperties()', function() {
       it('should unpatch target properties patched on HTML objects', function() {
         var testProperty = 'innerHTML';
-        var testProperty2 = 'parentElement';
         var testingFunction = function() {
           return 'testing';
         };
         var element = document.createElement('a');
         expect(element[testProperty]).toBe('');
-        patchServices.patchMaker.patchProperties(element, testingFunction);
+        patchServices.patchElementProperties(element, testingFunction);
         expect(element[testProperty]).not.toBe('');
-        patchServices.patchMaker.unPatch(element);
+        patchServices.unpatchElementProperties(element);
         expect(element[testProperty]).toBe('');
       });
     });
@@ -51,9 +50,9 @@ ddescribe('patchServices', function() {
         var testProperty = objectProperties[0];
         var originalFunction = Element.prototype[testProperty];
         expect(Element.prototype[testProperty]).toBe(originalFunction);
-        patchServices.prototypePatcher.addManipulationListener();
+        patchServices.addManipulationListener();
         expect(Element.prototype[testProperty]).not.toBe(originalFunction);
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
       });
 
       it('should patch the functions of Node.prototype', function() {
@@ -61,9 +60,9 @@ ddescribe('patchServices', function() {
         var testProperty = objectProperties[0];
         var originalFunction = Node.prototype[testProperty];
         expect(Node.prototype[testProperty]).toBe(originalFunction);
-        patchServices.prototypePatcher.addManipulationListener();
+        patchServices.addManipulationListener();
         expect(Node.prototype[testProperty]).not.toBe(originalFunction);
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
       });
 
       it('should patch the functions of EventTarget.prototype', function() {
@@ -71,9 +70,9 @@ ddescribe('patchServices', function() {
         var testProperty = objectProperties[0];
         var originalFunction = EventTarget.prototype[testProperty];
         expect(EventTarget.prototype[testProperty]).toBe(originalFunction);
-        patchServices.prototypePatcher.addManipulationListener();
+        patchServices.addManipulationListener();
         expect(EventTarget.prototype[testProperty]).not.toBe(originalFunction);
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
       });
 
       it('should patch the prototype functions to call the listener param', function() {
@@ -83,11 +82,11 @@ ddescribe('patchServices', function() {
         }
         spyOn(testFunctionObject, 'testingFunction');
         expect(testFunctionObject.testingFunction).not.toHaveBeenCalled();
-        patchServices.prototypePatcher.addManipulationListener(testFunctionObject.testingFunction);
+        patchServices.addManipulationListener(testFunctionObject.testingFunction);
         var element = document.createElement('a');
         element.getAttribute('NamedNodeMap');
         expect(testFunctionObject.testingFunction).toHaveBeenCalled();
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
       });
 
       it('should detect getting element.innerHTML', function() {
@@ -96,10 +95,10 @@ ddescribe('patchServices', function() {
         spyOn(testObj2, 'testFunction');
         expect(testObj2.testFunction).not.toHaveBeenCalled();
         var element = document.createElement('div');
-        patchServices.patchMaker.patchProperties(element, testObj2.testFunction);
+        patchServices.patchElementProperties(element, testObj2.testFunction);
         var inner = element['innerHTML'];
         expect(testObj2.testFunction).toHaveBeenCalled();
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
       });
 
 
@@ -109,10 +108,10 @@ ddescribe('patchServices', function() {
         spyOn(testObj3, 'testFunction');
         expect(testObj3.testFunction).not.toHaveBeenCalled();
         var element = document.createElement('div');
-        patchServices.patchMaker.patchProperties(element, testObj3.testFunction);
+        patchServices.patchElementProperties(element, testObj3.testFunction);
         element.innerHTML = 'blank';
         expect(testObj3.testFunction).toHaveBeenCalled();
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
       });
 
 
@@ -122,10 +121,10 @@ ddescribe('patchServices', function() {
         spyOn(testObj4, 'testFunction');
         expect(testObj4.testFunction).not.toHaveBeenCalled();
         var element = document.createElement('div');
-        patchServices.patchMaker.patchProperties(element, testObj4.testFunction);
+        patchServices.patchElementProperties(element, testObj4.testFunction);
         var parent = element.parentElement;
         expect(testObj4.testFunction).toHaveBeenCalled();
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
       });
 
 
@@ -133,12 +132,12 @@ ddescribe('patchServices', function() {
         var testObj5 = {};
         testObj5.testFunction = function(){};
         spyOn(testObj5, 'testFunction');
-        patchServices.prototypePatcher.addManipulationListener(testObj5.testFunction);
+        patchServices.addManipulationListener(testObj5.testFunction);
         expect(testObj5.testFunction).not.toHaveBeenCalled();
         var element = document.createElement('div');
         var parent = element.addEventListener('click', function(e){});
         expect(testObj5.testFunction).toHaveBeenCalled();
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
       });
 
 
@@ -146,12 +145,12 @@ ddescribe('patchServices', function() {
         var testObj6 = {};
         testObj6.testFunction = function(){};
         spyOn(testObj6, 'testFunction');
-        patchServices.prototypePatcher.addManipulationListener(testObj6.testFunction);
+        patchServices.addManipulationListener(testObj6.testFunction);
         expect(testObj6.testFunction).not.toHaveBeenCalled();
         var element = document.createElement('div');
         element.remove();
         expect(testObj6.testFunction).toHaveBeenCalled();
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
       });
 
 
@@ -162,12 +161,12 @@ ddescribe('patchServices', function() {
         var testObj7 = {};
         testObj7.testFunction = function(){};
         spyOn(testObj7, 'testFunction');
-        patchServices.prototypePatcher.addManipulationListener(testObj7.testFunction);
+        patchServices.addManipulationListener(testObj7.testFunction);
         expect(testObj7.testFunction).not.toHaveBeenCalled();
         var newElement = document.createElement('div');
         parentElement.insertBefore(newElement, referenceElement);
         expect(testObj7.testFunction).toHaveBeenCalled();
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
       });
 
 
@@ -179,11 +178,11 @@ ddescribe('patchServices', function() {
           return 'test function';
         };
         spyOn(testObj8, 'testFunction');
-        patchServices.prototypePatcher.addManipulationListener(testObj8.testFunction);
+        patchServices.addManipulationListener(testObj8.testFunction);
         expect(testObj8.testFunction).not.toHaveBeenCalled();
         parentElement.appendChild(childElement);
         expect(testObj8.testFunction).toHaveBeenCalled();
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
       });
     });
     describe('collectPrototypeProperties()', function() {
@@ -201,9 +200,9 @@ ddescribe('patchServices', function() {
         var testProperty = objectProperties[0];
         var originalFunction = Element.prototype[testProperty];
         expect(Element.prototype[testProperty]).toBe(originalFunction);
-        patchServices.prototypePatcher.addManipulationListener(mockObject.testFunction);
+        patchServices.addManipulationListener(mockObject.testFunction);
         expect(Element.prototype[testProperty]).not.toBe(originalFunction);
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
         expect(Element.prototype[testProperty]).toBe(originalFunction);
       });
 
@@ -214,9 +213,9 @@ ddescribe('patchServices', function() {
         var testProperty = objectProperties[0];
         var originalFunction = Node.prototype[testProperty];
         expect(Node.prototype[testProperty]).toBe(originalFunction);
-        patchServices.prototypePatcher.addManipulationListener(mockObject2.testFunction);
+        patchServices.addManipulationListener(mockObject2.testFunction);
         expect(Node.prototype[testProperty]).not.toBe(originalFunction);
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
         expect(Node.prototype[testProperty]).toBe(originalFunction);
       });
 
@@ -227,20 +226,20 @@ ddescribe('patchServices', function() {
         var testProperty = objectProperties[0];
         var originalFunction = EventTarget.prototype[testProperty];
         expect(EventTarget.prototype[testProperty]).toBe(originalFunction);
-        patchServices.prototypePatcher.addManipulationListener(mockObject3.testFunction);
+        patchServices.addManipulationListener(mockObject3.testFunction);
         expect(EventTarget.prototype[testProperty]).not.toBe(originalFunction);
-        patchServices.prototypePatcher.removeManipulationListener();
+        patchServices.removeManipulationListener();
         expect(EventTarget.prototype[testProperty]).toBe(originalFunction);
       });
     });
-    describe('detectCreation()', function() {
+    describe('patchElementsOnCreation()', function() {
         it('should detect the creation of HTML elements and call appropriate patching', function() {
-            patchServices.detectCreation(patchServices.listener);
-            spyOn(patchServices.patchMaker, 'patchProperties');
-            expect(patchServices.patchMaker.patchProperties).not.toHaveBeenCalled();
+            patchServices.patchElementsOnCreation(patchServices.listener);
+            spyOn(patchServices, 'patchElementProperties');
+            expect(patchServices.patchElementProperties).not.toHaveBeenCalled();
             var element = document.createElement('a');
-            expect(patchServices.patchMaker.patchProperties).toHaveBeenCalled();
-            patchServices.undetectCreation();
+            expect(patchServices.patchElementProperties).toHaveBeenCalled();
+            patchServices.unpatchCreatedElements();
         });
 
         it('should patch those HTML elements with a listener', function() {
@@ -249,22 +248,35 @@ ddescribe('patchServices', function() {
                 dump('Manipulation detected');
             }
             spyOn(mockTestingObj, 'mockTest');
-            patchServices.detectCreation(mockTestingObj.mockTest);
+            patchServices.patchElementsOnCreation(mockTestingObj.mockTest);
             var element = document.createElement('a');
             expect(mockTestingObj.mockTest).not.toHaveBeenCalled();
             element.innerHTML = 'test';
             expect(mockTestingObj.mockTest).toHaveBeenCalled();
-            patchServices.patchMaker.unPatch(element);
-            patchServices.undetectCreation();
+            patchServices.unpatchElementProperties(element);
+            patchServices.unpatchCreatedElements();
         });
     });
-    describe('undetectCreation()', function() {
+    describe('unpatchCreatedElements()', function() {
         it('should remove the patching of document.createElement', function() {
             var createElement = document['createElement'];
-            patchServices.detectCreation(patchServices.listener);
+            patchServices.patchElementsOnCreation(patchServices.listener);
             expect(createElement).not.toBe(document['createElement']);
-            patchServices.undetectCreation();
+            patchServices.unpatchCreatedElements();
             expect(createElement).toBe(document['createElement']);
+        });
+
+        it('should remove the patching of created elements', function() {
+            var testProperty = 'innerHTML';
+            var element = document.createElement('a');
+            expect(element[testProperty]).toBe('');
+
+            patchServices.patchElementsOnCreation(patchServices.listener);
+            var elementAfterPatch = document.createElement('a');
+            expect(elementAfterPatch[testProperty]).not.toBe(element[testProperty]);
+
+            patchServices.unpatchCreatedElements();
+            expect(elementAfterPatch[testProperty]).toBe(element[testProperty]);
         });
     });
   });

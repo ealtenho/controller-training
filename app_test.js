@@ -45,14 +45,14 @@ describe('controller application', function() {
 
 
     it('should unpatch prototypes after execution', function() {
-      spyOn(patchServices.prototypePatcher, 'removeManipulationListener');
-      expect(patchServices.prototypePatcher.removeManipulationListener).not.toHaveBeenCalled();
+      spyOn(patchServices, 'removeManipulationListener');
+      expect(patchServices.removeManipulationListener).not.toHaveBeenCalled();
       var controllerMock = function() {
         var element = document.createElement('a');
         element.innerHTML = 'testValue';
       };
       var ctrl = $controller(controllerMock);
-      expect(patchServices.prototypePatcher.removeManipulationListener).toHaveBeenCalled();
+      expect(patchServices.removeManipulationListener).toHaveBeenCalled();
     });
 
 
