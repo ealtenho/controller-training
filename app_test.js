@@ -45,14 +45,14 @@ describe('controller application', function() {
 
 
     it('should unpatch prototypes after execution', function() {
-      spyOn(patchServices, 'removeManipulationListener');
-      expect(patchServices.removeManipulationListener).not.toHaveBeenCalled();
+      spyOn(patchServices, 'unpatchOnePrototype');
+      expect(patchServices.unpatchOnePrototype).not.toHaveBeenCalled();
       var controllerMock = function() {
         var element = document.createElement('a');
         element.innerHTML = 'testValue';
       };
       var ctrl = $controller(controllerMock);
-      expect(patchServices.removeManipulationListener).toHaveBeenCalled();
+      expect(patchServices.unpatchOnePrototype).toHaveBeenCalled();
     });
 
 

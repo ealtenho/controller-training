@@ -30,8 +30,8 @@ patchServices.patchOnePrototype = function(type, listener) {
       var original = type.prototype[prop];
       if(typeof original === 'function') {
         type.prototype[prop] = function () {
-          patchServices.listener();
-          return original.apply(this, arguments);
+            patchServices.listener();
+            return original.apply(this, arguments);
         };
       }
     }
@@ -42,7 +42,7 @@ patchServices.patchOnePrototype = function(type, listener) {
   });
 }
 
-patchServices.unPatchOnePrototype = function(type, typeName) {
+patchServices.unpatchOnePrototype = function(type, typeName) {
   var objectProperties = Object.getOwnPropertyNames(type.prototype);
   objectProperties.forEach(function(prop) {
     try{
@@ -59,9 +59,9 @@ patchServices.unPatchOnePrototype = function(type, typeName) {
 }
 
 patchServices.patchElementsOnCreation = function(listener) {
-  var original = document['createElement'];
+  var unpatched = patchServices.originalProperties['DocumentCreate'];
   document['createElement'] = function(param) {
-    return patchServices.patchElementProperties(original.apply(this,arguments), listener);
+    return patchServices.patchElementProperties(unpatched.apply(this,arguments), listener);
   }
 };
 
@@ -115,17 +115,17 @@ patchServices.unpatchElementProperties = function(element) {
 };
 
 patchServices.addManipulationListener = function(listener) {
-  patchServices.patchElementsOnCreation(listener);
   patchServices.patchOnePrototype(Element, listener);
   patchServices.patchOnePrototype(Node, listener);
   patchServices.patchOnePrototype(EventTarget, listener);
+  patchServices.patchElementsOnCreation(listener);
 }
 
 patchServices.removeManipulationListener = function() {
+  patchServices.unpatchOnePrototype(Element, 'Element');
+  patchServices.unpatchOnePrototype(Node, 'Node');
+  patchServices.unpatchOnePrototype(EventTarget, 'EventTarget');
   patchServices.unpatchCreatedElements();
-  patchServices.unPatchOnePrototype(Element, 'Element');
-  patchServices.unPatchOnePrototype(Node, 'Node');
-  patchServices.unPatchOnePrototype(EventTarget, 'EventTarget');
 }
 
 patchServices.listener = function() {

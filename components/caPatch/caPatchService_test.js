@@ -1,4 +1,4 @@
-describe('patchServices', function() {
+ddescribe('patchServices', function() {
     describe('patchProperties()', function() {
       it('should patch target properties of created HTML objects', function() {
         var testProperty = 'innerHTML';
