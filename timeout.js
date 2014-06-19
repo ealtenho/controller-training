@@ -1,8 +1,6 @@
-angular.module('$timeout', []).
-config(function() {
-  'use strict';
-  function $TimeoutProvider() {
-    this.$get = ['$rootScope', '$browser', '$q', '$exceptionHandler',
+angular.module('$timeout', []);
+angular.module('$timeout').provider('$timeoutProvider', function $TimeoutProvider() {
+  this.$get = ['$rootScope', '$browser', '$q', '$exceptionHandler',
          function($rootScope,   $browser,   $q,   $exceptionHandler) {
       var deferreds = {};
 
@@ -82,5 +80,6 @@ config(function() {
 
       return timeout;
     }];
-  }
 });
+// angular.module('$timeout').config(['$timeoutProvider', function('$timeoutProvider') {
+// });
