@@ -8,8 +8,8 @@ patchServices.collectPrototypeProperties = function(type) {
       objectProperties[prop] = type.prototype[prop];
     }
     catch(e) {
-      dump('Access ' + prop + ' on ' + type.name);
-      dump(e);
+      //dump('Access ' + prop + ' on ' + type.name);
+      //dump(e);
     }
   });
   return objectProperties;
@@ -18,14 +18,14 @@ patchServices.collectPrototypeProperties = function(type) {
 patchServices.originalCreateElement = document['createElement'];
 
 patchServices.detectCreation = function(listener) {
-var original = document['createElement'];
-document['createElement'] = function(param) {
-  return patchServices.patchMaker.patchProperties(original.apply(this,arguments), listener);
-}
+  var original = document['createElement'];
+  document['createElement'] = function(param) {
+    return patchServices.patchMaker.patchProperties(original.apply(this,arguments), listener);
+  }
 };
 
 patchServices.undetectCreation = function() {
-document['createElement'] = patchServices.originalCreateElement;
+  document['createElement'] = patchServices.originalCreateElement;
 };
 
 patchServices.patchMaker = {
@@ -73,20 +73,21 @@ patchServices.prototypePatcher = {
     'EventTarget': patchServices.collectPrototypeProperties(EventTarget)
   },
   patchOnePrototype: function(type, listener) {
+    patchServices.listener = listener;
     var objectProperties = Object.getOwnPropertyNames(type.prototype);
     objectProperties.forEach(function(prop) {
       try {
         var original = type.prototype[prop];
         if(typeof original === 'function') {
           type.prototype[prop] = function () {
-            listener();
-              return original.apply(this, arguments);
+            patchServices.listener();
+            return original.apply(this, arguments);
           };
         }
       }
       catch(e){
-        dump('Access ' + prop + ' on ' + type.name);
-        dump(e);
+        //dump('Access ' + prop + ' on ' + type.name);
+        //dump(e);
       }
     });
   },
@@ -95,25 +96,25 @@ patchServices.prototypePatcher = {
     patchServices.prototypePatcher.patchOnePrototype(Node, listener);
     patchServices.prototypePatcher.patchOnePrototype(EventTarget, listener);
   },
-  unPatchOnePrototype: function(type) {
+  unPatchOnePrototype: function(type, typeName) {
     var objectProperties = Object.getOwnPropertyNames(type.prototype);
     objectProperties.forEach(function(prop) {
       try{
       var alteredElement = type.prototype[prop];
         if(typeof alteredElement === 'function') {
-          type.prototype[prop] = patchServices.prototypePatcher.originalProperties[type.name][prop];
-       }
+          type.prototype[prop] = patchServices.prototypePatcher.originalProperties[typeName][prop];
+        }
       }
       catch(e) {
-        dump('Access ' + prop + ' on ' + type.name);
-        dump(e);
+        //dump('Access ' + prop + ' on ' + type.name);
+        //dump(e);
       }
     });
   },
   removeManipulationListener: function() {
-    patchServices.prototypePatcher.unPatchOnePrototype(Element);
-    patchServices.prototypePatcher.unPatchOnePrototype(Node);
-    patchServices.prototypePatcher.unPatchOnePrototype(EventTarget);
+    patchServices.prototypePatcher.unPatchOnePrototype(Element, 'Element');
+    patchServices.prototypePatcher.unPatchOnePrototype(Node, 'Node');
+    patchServices.prototypePatcher.unPatchOnePrototype(EventTarget, 'EventTarget');
   }
 };
 
