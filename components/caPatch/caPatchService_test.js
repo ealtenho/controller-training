@@ -186,10 +186,11 @@ ddescribe('patchServices', function() {
         patchServices.prototypePatcher.removeManipulationListener();
       });
     });
-    describe('collectProperties()', function() {
-      it('should collect the unpatched properties of Element.prototype', function() {
+    describe('collectPrototypeProperties()', function() {
+      it('should collect the unpatched properties of prototypes', function() {
         var objectPropertyNames = Object.getOwnPropertyNames(Element.prototype);
-        expect(patchServices.prototypePatcher.originalProperties[objectPropertyNames[0]]).toBe(Element.prototype[objectPropertyNames[0]]);
+        var originalProperties = patchServices.collectPrototypeProperties(Element);
+        expect(originalProperties[objectPropertyNames[0]]).toBe(Element.prototype[objectPropertyNames[0]]);
       });
     });
     describe('removeManipulationListener()', function() {

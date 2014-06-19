@@ -1,49 +1,19 @@
 var patchServices = {};
 
-patchServices.collectProperties = function() {
-    var objectProperties = {};
-    var objectPropertyNames = Object.getOwnPropertyNames(Element.prototype);
-    objectPropertyNames.forEach(function(prop) {
-      try {
-        objectProperties[prop] = Element.prototype[prop];
-      }
-      catch(e) {
-        dump('Access ' + prop + ' on Element');
-        dump(e);
-      }
-    });
-    return objectProperties;
-  };
-
-patchServices.collectPropertiesNode = function() {
-    var objectProperties = {};
-    var objectPropertyNames = Object.getOwnPropertyNames(Node.prototype);
-    objectPropertyNames.forEach(function(prop) {
-      try {
-        objectProperties[prop] = Node.prototype[prop];
-      }
-      catch(e) {
-        dump('Access ' + prop + ' on Node');
-        dump(e);
-      }
-    });
-    return objectProperties;
-  };
-
-patchServices.collectPropertiesEventTarget = function() {
-    var objectProperties = {};
-    var objectPropertyNames = Object.getOwnPropertyNames(EventTarget.prototype);
-    objectPropertyNames.forEach(function(prop) {
-      try {
-        objectProperties[prop] = EventTarget.prototype[prop];
-      }
-      catch(e) {
-        dump('Access ' + prop + ' on EventTarget');
-        dump(e);
-      }
-    });
-    return objectProperties;
-  };
+patchServices.collectPrototypeProperties = function(type) {
+  var objectProperties = {};
+  var objectPropertyNames = Object.getOwnPropertyNames(type.prototype);
+  objectPropertyNames.forEach(function(prop) {
+    try {
+      objectProperties[prop] = type.prototype[prop];
+    }
+    catch(e) {
+      dump('Access ' + prop + ' on ' + type.name);
+      dump(e);
+    }
+  });
+  return objectProperties;
+};
 
 patchServices.originalCreateElement = document['createElement'];
 
@@ -97,9 +67,11 @@ patchServices.patchMaker = {
 }
 
 patchServices.prototypePatcher = {
-  originalProperties: patchServices.collectProperties(),
-  originalPropertiesNode: patchServices.collectPropertiesNode(),
-  originalPropertiesEventTarget: patchServices.collectPropertiesEventTarget(),
+  originalProperties: {
+    'Element': patchServices.collectPrototypeProperties(Element),
+    'Node': patchServices.collectPrototypeProperties(Node),
+    'EventTarget': patchServices.collectPrototypeProperties(EventTarget)
+  },
   patchOnePrototype: function(type, listener) {
     var objectProperties = Object.getOwnPropertyNames(type.prototype);
     objectProperties.forEach(function(prop) {
@@ -113,7 +85,7 @@ patchServices.prototypePatcher = {
         }
       }
       catch(e){
-        dumpa('Access ' + prop + ' on ' + type.name);
+        dump('Access ' + prop + ' on ' + type.name);
         dump(e);
       }
     });
@@ -129,7 +101,7 @@ patchServices.prototypePatcher = {
       try{
       var alteredElement = Element.prototype[prop];
         if(typeof alteredElement === 'function') {
-          Element.prototype[prop] = patchServices.prototypePatcher.originalProperties[prop];
+          Element.prototype[prop] = patchServices.prototypePatcher.originalProperties['Element'][prop];
        }
       }
       catch(e) {
@@ -143,7 +115,7 @@ patchServices.prototypePatcher = {
     try{
       var alteredElementNode = Node.prototype[prop];
       if(typeof alteredElementNode === 'function') {
-        Node.prototype[prop] = patchServices.prototypePatcher.originalPropertiesNode[prop];
+        Node.prototype[prop] = patchServices.prototypePatcher.originalProperties['Node'][prop];
       }
     }
     catch(e) {
@@ -156,7 +128,7 @@ patchServices.prototypePatcher = {
     objectPropertiesEventTarget.forEach(function(prop) {
       var alteredElementEventTarget = EventTarget.prototype[prop];
       if(typeof alteredElementEventTarget === 'function') {
-        EventTarget.prototype[prop] = patchServices.prototypePatcher.originalPropertiesEventTarget[prop];
+        EventTarget.prototype[prop] = patchServices.prototypePatcher.originalProperties['EventTarget'][prop];
       }
     });
   }
