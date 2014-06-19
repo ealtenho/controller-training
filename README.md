@@ -1,7 +1,7 @@
 controller-training [![Build Status](https://travis-ci.org/ealtenho/controller-training.svg?branch=master)](https://travis-ci.org/ealtenho/controller-training)
 ===================
 
-Detect manipulation of DOM APIs from controllers to encourage AngularJS best practices
+**Detect manipulation of DOM APIs from controllers to encourage AngularJS best practices**
 
 [AngularJS](https://angularjs.org/) provides a framework for separating the implementation of a web application into logical components. This separation of concerns is important for code development, maintenance and especially testing. With modular code, it is easy to implement unit tests.
 
