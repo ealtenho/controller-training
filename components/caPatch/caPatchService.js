@@ -100,50 +100,28 @@ patchServices.prototypePatcher = {
   originalProperties: patchServices.collectProperties(),
   originalPropertiesNode: patchServices.collectPropertiesNode(),
   originalPropertiesEventTarget: patchServices.collectPropertiesEventTarget(),
-  addManipulationListener: function(listener) {
-    var objectProperties = Object.getOwnPropertyNames(Element.prototype);
+  patchOnePrototype: function(type, listener) {
+    var objectProperties = Object.getOwnPropertyNames(type.prototype);
     objectProperties.forEach(function(prop) {
       try {
-        var original = Element.prototype[prop];
+        var original = type.prototype[prop];
         if(typeof original === 'function') {
-          Element.prototype[prop] = function () {
+          type.prototype[prop] = function () {
             listener();
-            return original.apply(this, arguments);
+              return original.apply(this, arguments);
           };
         }
       }
       catch(e){
-        dump('Access ' + prop + ' on Element');
-        dump(e);
-      }
-
-    });
-    var nodeProperties = Object.getOwnPropertyNames(Node.prototype);
-    nodeProperties.forEach(function(prop) {
-      try {
-      var originalNode = Node.prototype[prop];
-        if(typeof originalNode === 'function') {
-          Node.prototype[prop] = function () {
-            listener();
-            return originalNode.apply(this, arguments);
-          };
-        }
-      }
-      catch(e) {
-        dump('Access ' + prop + ' on Node');
+        dumpa('Access ' + prop + ' on ' + type.name);
         dump(e);
       }
     });
-    var eventTargetProperties = Object.getOwnPropertyNames(EventTarget.prototype);
-    eventTargetProperties.forEach(function(prop) {
-      var originalEventTarget = EventTarget.prototype[prop];
-      if(typeof originalEventTarget === 'function') {
-        EventTarget.prototype[prop] = function () {
-          listener();
-          return originalEventTarget.apply(this, arguments);
-        };
-      }
-    });
+  },
+  addManipulationListener: function(listener) {
+    patchServices.prototypePatcher.patchOnePrototype(Element, listener);
+    patchServices.prototypePatcher.patchOnePrototype(Node, listener);
+    patchServices.prototypePatcher.patchOnePrototype(EventTarget, listener);
   },
   removeManipulationListener: function() {
     var objectProperties = Object.getOwnPropertyNames(Element.prototype);
