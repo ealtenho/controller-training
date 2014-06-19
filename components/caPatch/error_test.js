@@ -1,6 +1,6 @@
 describe('Controller error', function() {
   var $controller;
-  beforeEach(module('controllerApp'));
+  beforeEach(module('controllerTrainer'));
   beforeEach(inject(function(_$controller_) {
     $controller = _$controller_;
   }));

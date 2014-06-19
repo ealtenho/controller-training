@@ -1,6 +1,6 @@
 describe('Asynchronous controller execution detection', function(){
   var $controller, $rootScope;
-  beforeEach(module('controllerApp'));
+  beforeEach(module('controllerTrainer'));
   beforeEach(module('$timeout'));
   beforeEach(inject(function(_$controller_, _$rootScope_) {
     $controller = _$controller_;
