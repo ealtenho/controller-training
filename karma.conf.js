@@ -13,8 +13,8 @@ module.exports = function(config) {
       'components/caPatch/caPatchService.js',
       'components/caPatch/caPatchService_test.js',
       'async_test.js',
-      'app.js',
-      'app_test.js'
+      'controllerTrainer.js',
+      'controllerTrainer_test.js'
     ],
     exclude: [
     ],
