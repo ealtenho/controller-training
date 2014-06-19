@@ -95,42 +95,25 @@ patchServices.prototypePatcher = {
     patchServices.prototypePatcher.patchOnePrototype(Node, listener);
     patchServices.prototypePatcher.patchOnePrototype(EventTarget, listener);
   },
-  removeManipulationListener: function() {
-    var objectProperties = Object.getOwnPropertyNames(Element.prototype);
+  unPatchOnePrototype: function(type) {
+    var objectProperties = Object.getOwnPropertyNames(type.prototype);
     objectProperties.forEach(function(prop) {
       try{
-      var alteredElement = Element.prototype[prop];
+      var alteredElement = type.prototype[prop];
         if(typeof alteredElement === 'function') {
-          Element.prototype[prop] = patchServices.prototypePatcher.originalProperties['Element'][prop];
+          type.prototype[prop] = patchServices.prototypePatcher.originalProperties[type.name][prop];
        }
       }
       catch(e) {
-        dump('Access ' + prop + ' on Element');
+        dump('Access ' + prop + ' on ' + type.name);
         dump(e);
       }
     });
-
-    var objectPropertiesNode = Object.getOwnPropertyNames(Node.prototype);
-    objectPropertiesNode.forEach(function(prop) {
-    try{
-      var alteredElementNode = Node.prototype[prop];
-      if(typeof alteredElementNode === 'function') {
-        Node.prototype[prop] = patchServices.prototypePatcher.originalProperties['Node'][prop];
-      }
-    }
-    catch(e) {
-      dump('Access ' + prop + ' on Node');
-      dump(e);
-    }
-    });
-
-    var objectPropertiesEventTarget = Object.getOwnPropertyNames(EventTarget.prototype);
-    objectPropertiesEventTarget.forEach(function(prop) {
-      var alteredElementEventTarget = EventTarget.prototype[prop];
-      if(typeof alteredElementEventTarget === 'function') {
-        EventTarget.prototype[prop] = patchServices.prototypePatcher.originalProperties['EventTarget'][prop];
-      }
-    });
+  },
+  removeManipulationListener: function() {
+    patchServices.prototypePatcher.unPatchOnePrototype(Element);
+    patchServices.prototypePatcher.unPatchOnePrototype(Node);
+    patchServices.prototypePatcher.unPatchOnePrototype(EventTarget);
   }
 };
 
