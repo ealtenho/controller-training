@@ -1,4 +1,9 @@
 describe('patchServices', function() {
+    beforeEach(function() {
+        patchServices.listener = function() {
+          console.log('Harmless Error');
+        }
+    });
     describe('patchProperties()', function() {
       it('should patch target properties of created HTML objects', function() {
         var testProperty = 'innerHTML';
@@ -10,6 +15,7 @@ describe('patchServices', function() {
         patchServices.patchElementProperties(element, testingFunction);
         expect(element[testProperty]).not.toBe('');
       });
+
 
       it('should preserve the functionality of DOM APIS that are patched', function() {
         var testProperty = 'innerHTML';
@@ -55,6 +61,7 @@ describe('patchServices', function() {
         patchServices.removeManipulationListener();
       });
 
+
       it('should patch the functions of Node.prototype', function() {
         var objectProperties = Object.getOwnPropertyNames(Node.prototype);
         var testProperty = objectProperties[0];
@@ -65,6 +72,7 @@ describe('patchServices', function() {
         patchServices.removeManipulationListener();
       });
 
+
       it('should patch the functions of EventTarget.prototype', function() {
         var objectProperties = Object.getOwnPropertyNames(EventTarget.prototype);
         var testProperty = objectProperties[0];
@@ -74,6 +82,7 @@ describe('patchServices', function() {
         expect(EventTarget.prototype[testProperty]).not.toBe(originalFunction);
         patchServices.removeManipulationListener();
       });
+
 
       it('should patch the prototype functions to call the listener param', function() {
         var testFunctionObject = {};
@@ -206,6 +215,7 @@ describe('patchServices', function() {
         expect(Element.prototype[testProperty]).toBe(originalFunction);
       });
 
+
       it('should remove the patch from functions on Node.prototype', function() {
         var mockObject2 = {};
         mockObject2.testFunction = function(){};
@@ -218,6 +228,7 @@ describe('patchServices', function() {
         patchServices.removeManipulationListener();
         expect(Node.prototype[testProperty]).toBe(originalFunction);
       });
+
 
       it('should remove the patch from functions on EventTarget.prototype', function() {
         var mockObject3 = {};
@@ -242,6 +253,7 @@ describe('patchServices', function() {
             patchServices.unpatchCreatedElements();
         });
 
+
         it('should patch those HTML elements with a listener', function() {
             var mockTestingObj = {};
             mockTestingObj.mockTest = function() {
@@ -265,6 +277,7 @@ describe('patchServices', function() {
             patchServices.unpatchCreatedElements();
             expect(createElement).toBe(document['createElement']);
         });
+
 
         it('should remove the patching of created elements', function() {
             var testProperty = 'innerHTML';

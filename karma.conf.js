@@ -8,9 +8,11 @@ module.exports = function(config) {
       'node_modules/zone.js/zone.js',
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
+      'components/caPatch/error_test.js',
       'timeout.js',
       'components/caPatch/caPatchService.js',
       'components/caPatch/caPatchService_test.js',
+      'async_test.js',
       'app.js',
       'app_test.js'
     ],

@@ -30,7 +30,7 @@ patchServices.patchOnePrototype = function(type, listener) {
       var original = type.prototype[prop];
       if(typeof original === 'function') {
         type.prototype[prop] = function () {
-            patchServices.listener();
+            patchServices.listener(prop);
             return original.apply(this, arguments);
         };
       }
@@ -80,11 +80,11 @@ patchServices.patchElementProperties = function(element, listener) {
       Object.defineProperty(element, prop, {
         configurable: true,
         get: function() {
-          listener();
+          listener(prop);
           return element.prop;
         },
         set: function(newValue) {
-          listener();
+          listener(prop);
           element.prop = newValue;
         }
       });
@@ -128,7 +128,14 @@ patchServices.removeManipulationListener = function() {
   patchServices.unpatchCreatedElements();
 }
 
-patchServices.listener = function() {
-  return 'DOM Manipulation detected';
+patchServices.defaultError = 'Angular best practices are to manipulate the DOM in the view. ' +
+'Remove DOM manipulation from the controller. ' +
+'Thrown because of manipulating property:';
+
+
+patchServices.listener = function(property) {
+ e = new Error(patchServices.defaultError + ' ' + property);
+ e += '\n' + e.stack.split('\n')[3];
+ throw e;
 };
 
