@@ -26,6 +26,6 @@ in app-controller.js to see why. The second implementation uses Angular techniqu
 
 <!-- 3. Angular method of removing an element -->
 <div ng-controller="SampleAppController">
-  {{removeTime}}
-  <div ng-show="removeTime != true" id="remove">Removed after 30 seconds.</div>
+  {{sampleAppCtrl.time = removeTime}}
+  <div ng-show="sampleAppCtrl.time != true" id="remove">Removed after 30 seconds.</div>
 </div>

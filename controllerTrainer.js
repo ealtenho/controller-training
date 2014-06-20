@@ -8,7 +8,7 @@ angular.module('controllerTrainer', []).
     $provide.decorator('$controller', function($delegate) {
       //Implemented within a zone from zone.js in order
       //to account for asynchronous controller manipulation
-      var controllerZone = zone.fork({
+      var controllerZone = zone.fork(Zone.longStackTraceZone).fork({
         beforeTask: function() {
           //Patches prototypes and individual HTML elements
           //that represent the DOM APIs.

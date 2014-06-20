@@ -43,5 +43,5 @@ angular.module('sampleApp').
       $timeout(function() {
         console.log('Running');
         $scope.removeTime = true;
-      }.bind($scope), 3000);
+      }, 3000);
   }]);
