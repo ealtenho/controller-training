@@ -11,12 +11,11 @@ angular.module('controllerTrainer', []).
       var controllerZone = zone.fork({
         beforeTask: function() {
           //Patches prototypes and individual HTML elements
-          //that represent the DOM APIs
-          //Uses patchServices.listener as the parameter of the
-          //function to be called when manipulation is detected.
-          //Default patchServices.listener throws an error, but
-          //patchServices.listener can be set to any function.
-          patchServices.addManipulationListener(patchServices.listener);
+          //that represent the DOM APIs.
+          //Takes an optional parameter of a function to use as the
+          //error indicator. Without the parameter patchServices.listener() is
+          //used as the default patching function.
+          patchServices.addManipulationListener();
         },
         afterTask: function() {
           //Removes the patching of prototypes and

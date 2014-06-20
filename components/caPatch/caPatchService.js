@@ -6,6 +6,10 @@ var patchServices = {};
 * are set back to these original values
 **/
 patchServices.collectPrototypeProperties = function(type) {
+  if(type ==  undefined || type.prototype == undefined) {
+    throw new Error('collectPrototypeProperties() needs a .prototype to collect properties from. ' +
+      type + '.prototype is undefined.');
+  }
   var objectProperties = {};
   var objectPropertyNames = Object.getOwnPropertyNames(type.prototype);
   objectPropertyNames.forEach(function(prop) {
@@ -37,9 +41,14 @@ patchServices.originalProperties = {
 * Helper function for patching one prototype.
 * Patches the given type with the addition of a
 * call to listener, a function passed as a parameter.
+* If no listener function is provided, the default listener is used.
 */
 patchServices.patchOnePrototype = function(type, listener) {
-  patchServices.listener = listener;
+  patchServices.setListener(listener);
+  if(type ==  undefined || type.prototype == undefined) {
+    throw new Error('collectPrototypeProperties() needs a .prototype to collect properties from. ' +
+      type + '.prototype is undefined.');
+  }
   var objectProperties = Object.getOwnPropertyNames(type.prototype);
   objectProperties.forEach(function(prop) {
     //Access of some prototype values may throw an error
@@ -65,6 +74,9 @@ patchServices.patchOnePrototype = function(type, listener) {
 * original values that were collected.
 **/
 patchServices.unpatchOnePrototype = function(type, typeName) {
+  if(typeName == undefined) {
+    throw new Error('typeName must be the name used to save prototype properties. Got: ' + typeName);
+  }
   var objectProperties = Object.getOwnPropertyNames(type.prototype);
   objectProperties.forEach(function(prop) {
     //Access of some prototype values may throw an error
@@ -75,7 +87,7 @@ patchServices.unpatchOnePrototype = function(type, typeName) {
       }
     }
     catch(e) {
-      //dump('Access ' + prop + ' on ' + type.name);
+      //dump('Access ' + prop + ' on ' + typeName);
       //dump(e);
     }
   });
@@ -93,7 +105,7 @@ patchServices.propertiesToPatch = ['innerHTML', 'parentElement'];
 /**
 * Object to hold original version of patched elements
 */
-patchServices.savedExisting = {};
+patchServices.savedElements = {};
 
 /**
 * Function to save properties that will be patched
@@ -104,7 +116,7 @@ patchServices.save = function(element, index) {
   patchServices.propertiesToPatch.forEach(function(prop) {
     elementProperties[prop] = element[prop];
   });
-  patchServices.savedExisting[index] = elementProperties;
+  patchServices.savedElements[index] = elementProperties;
 };
 
 
@@ -113,15 +125,16 @@ patchServices.save = function(element, index) {
 * element to call the listener function on getting or setting
 **/
 patchServices.patchElementProperties = function(element, listener) {
+  patchServices.setListener(listener);
   patchServices.propertiesToPatch.forEach(function(prop) {
       Object.defineProperty(element, prop, {
         configurable: true,
         get: function() {
-          listener(prop);
+          patchServices.listener(prop);
           return element.prop;
         },
         set: function(newValue) {
-          listener(prop);
+          patchServices.listener(prop);
           element.prop = newValue;
         }
       });
@@ -153,6 +166,7 @@ patchServices.unpatchElementProperties = function(element, originalElement) {
 * patches them to call the given listener function if manipulated.
 */
 patchServices.patchExistingElements = function(listener) {
+  patchServices.setListener(listener);
   elements = document.getElementsByTagName('*');
   for(var i = 0; i < elements.length; i++) {
     patchServices.save(elements[i], i);
@@ -166,7 +180,7 @@ patchServices.patchExistingElements = function(listener) {
 patchServices.unpatchExistingElements = function() {
   elements = document.getElementsByTagName('*');
   for(var i = 0; i < elements.length; i++) {
-    var originalElement = patchServices.savedExisting[i];
+    var originalElement = patchServices.savedElements[i];
     patchServices.unpatchElementProperties(elements[i], originalElement);
   }
 };
@@ -177,11 +191,12 @@ patchServices.unpatchExistingElements = function() {
 * HTML elements.
 **/
 patchServices.addManipulationListener = function(listener) {
-  patchServices.patchExistingElements(listener);
-  patchServices.patchOnePrototype(Element, listener);
-  patchServices.patchOnePrototype(Node, listener);
-  patchServices.patchOnePrototype(EventTarget, listener);
-  patchServices.patchOnePrototype(Document, listener);
+  patchServices.setListener(listener);
+  patchServices.patchExistingElements();
+  patchServices.patchOnePrototype(Element);
+  patchServices.patchOnePrototype(Node);
+  patchServices.patchOnePrototype(EventTarget);
+  patchServices.patchOnePrototype(Document);
 };
 
 /**
@@ -205,6 +220,24 @@ patchServices.removeManipulationListener = function() {
 patchServices.defaultError = 'Angular best practices are to manipulate the DOM in the view. ' +
 'Remove DOM manipulation from the controller. ' +
 'Thrown because of manipulating property:';
+
+/**
+* Set the listener function to a custom value
+* if the provided listener is not undefined and
+* is a function. If the parameter does not meet these
+* standards, leave patchServices.listener as the default error
+* throwing function.
+*/
+patchServices.setListener = function(listener) {
+  if(listener != undefined) {
+    if(typeof listener === 'function') {
+      patchServices.listener = listener;
+    }
+    else {
+      throw new Error('listener must be a function, got: ' + typeof listener);
+    }
+  }
+};
 
 /**
 * Error function thrown on detection of DOM manipulation.
