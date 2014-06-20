@@ -81,26 +81,6 @@ patchServices.unpatchOnePrototype = function(type, typeName) {
   });
 };
 
-/**
-* Object to hold properties that will be patched to return them
-* to original state after patching.
-**/
-patchServices.savedElements = {};
-
-/**
-* Helper method to force patching of individual HTML elements on
-* creation. Any use of document.create is patched to create a version
-* of the element using patchServices.patchElementProperties.
-* Element properties are patched with the given listener parameter.
-**/
-patchServices.patchElementsOnCreation = function(listener) {
-  var unpatched = patchServices.originalProperties['DocumentCreate'];
-  document['createElement'] = function(param) {
-    var original = unpatched.apply(this, arguments);
-    patchServices[original] = original;
-    return patchServices.patchElementProperties(original, listener);
-  }
-};
 
 /**
 * List of DOM API properties to patch on individual elements.
@@ -111,16 +91,22 @@ patchServices.propertiesToPatch = ['innerHTML', 'parentElement'];
 
 
 /**
-* Array for unpatched version of elements
-**/
-patchServices.patchedElements = new Array;
+* Object to hold original version of patched elements
+*/
+patchServices.savedExisting = {};
 
 /**
 * Function to save properties that will be patched
+* Each element has an object associating with it the patched properties
 **/
-patchServices.saveProp = function(element, prop) {
-  patchServices.savedProperties[prop] = element[prop];
+patchServices.save = function(element, index) {
+  elementProperties = {};
+  patchServices.propertiesToPatch.forEach(function(prop) {
+    elementProperties[prop] = element[prop];
+  });
+  patchServices.savedExisting[index] = elementProperties;
 };
+
 
 /**
 * Helper function to patch specified properties of a given
@@ -128,7 +114,6 @@ patchServices.saveProp = function(element, prop) {
 **/
 patchServices.patchElementProperties = function(element, listener) {
   patchServices.propertiesToPatch.forEach(function(prop) {
-      //patchServices.saveProp(element, prop);
       Object.defineProperty(element, prop, {
         configurable: true,
         get: function() {
@@ -141,20 +126,7 @@ patchServices.patchElementProperties = function(element, listener) {
         }
       });
   });
-  patchServices.patchedElements.push(element);
   return element;
-};
-
-/**
-* Helper function to turn off the patching of all elements
-* on the calling of document.create and to return patched
-* elements to their unpatched state
-*/
-patchServices.unpatchCreatedElements = function() {
-  document['createElement'] = patchServices.originalProperties['DocumentCreate'];
-  patchServices.patchedElements.forEach(function(elem) {
-    patchServices.unpatchElementProperties(elem, patchServices.savedElements[elem]);
-  });
 };
 
 /**
@@ -174,15 +146,12 @@ patchServices.unpatchElementProperties = function(element, originalElement) {
   });
 };
 
-patchServices.savedExisting = {};
-patchServices.save = function(element, index) {
-  elementProperties = {};
-  patchServices.propertiesToPatch.forEach(function(prop) {
-    elementProperties[prop] = element[prop];
-  });
-  patchServices.savedExisting[index] = elementProperties;
-};
-
+/**
+* While patching prototypes patches many of the DOM APIs,
+* some properties exist only on the elements themselves. This
+* function retrieves all the current elements on the page and
+* patches them to call the given listener function if manipulated.
+*/
 patchServices.patchExistingElements = function(listener) {
   elements = document.getElementsByTagName('*');
   for(var i = 0; i < elements.length; i++) {
@@ -191,6 +160,9 @@ patchServices.patchExistingElements = function(listener) {
   }
 };
 
+/**
+* Unpatches all the elements on the page that were patched.
+*/
 patchServices.unpatchExistingElements = function() {
   elements = document.getElementsByTagName('*');
   for(var i = 0; i < elements.length; i++) {
@@ -210,7 +182,6 @@ patchServices.addManipulationListener = function(listener) {
   patchServices.patchOnePrototype(Node, listener);
   patchServices.patchOnePrototype(EventTarget, listener);
   patchServices.patchOnePrototype(Document, listener);
-  //patchServices.patchElementsOnCreation(listener);
 };
 
 /**
@@ -224,7 +195,6 @@ patchServices.removeManipulationListener = function() {
   patchServices.unpatchOnePrototype(Node, 'Node');
   patchServices.unpatchOnePrototype(EventTarget, 'EventTarget');
   patchServices.unpatchOnePrototype(Document, 'Document');
-  //patchServices.unpatchCreatedElements();
   patchServices.unpatchExistingElements();
 };
 

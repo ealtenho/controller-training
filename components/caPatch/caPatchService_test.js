@@ -258,55 +258,6 @@ describe('patchServices', function() {
         expect(EventTarget.prototype[testProperty]).toBe(originalFunction);
       });
     });
-    // describe('patchElementsOnCreation()', function() {
-    //     it('should detect the creation of HTML elements and call appropriate patching', function() {
-    //         patchServices.patchElementsOnCreation(patchServices.listener);
-    //         spyOn(patchServices, 'patchElementProperties');
-    //         expect(patchServices.patchElementProperties).not.toHaveBeenCalled();
-    //         var element = document.createElement('a');
-    //         expect(patchServices.patchElementProperties).toHaveBeenCalled();
-    //         patchServices.unpatchCreatedElements();
-    //     });
-
-
-    //     it('should patch those HTML elements with a listener', function() {
-    //         var mockTestingObj = {};
-    //         mockTestingObj.mockTest = function() {
-    //             dump('Manipulation detected');
-    //         }
-    //         spyOn(mockTestingObj, 'mockTest');
-    //         patchServices.patchElementsOnCreation(mockTestingObj.mockTest);
-    //         var element = document.createElement('a');
-    //         expect(mockTestingObj.mockTest).not.toHaveBeenCalled();
-    //         element.innerHTML = 'test';
-    //         expect(mockTestingObj.mockTest).toHaveBeenCalled();
-    //         patchServices.unpatchElementProperties(element);
-    //         patchServices.unpatchCreatedElements();
-    //     });
-    // });
-    // describe('unpatchCreatedElements()', function() {
-    //     it('should remove the patching of document.createElement', function() {
-    //         var createElement = document['createElement'];
-    //         patchServices.patchElementsOnCreation(patchServices.listener);
-    //         expect(createElement).not.toBe(document['createElement']);
-    //         patchServices.unpatchCreatedElements();
-    //         expect(createElement).toBe(document['createElement']);
-    //     });
-
-
-    //     it('should remove the patching of created elements', function() {
-    //         var testProperty = 'innerHTML';
-    //         var element = document.createElement('a');
-    //         expect(element[testProperty]).toBe('');
-
-    //         patchServices.patchElementsOnCreation(patchServices.listener);
-    //         var elementAfterPatch = document.createElement('a');
-    //         expect(elementAfterPatch[testProperty]).not.toBe(element[testProperty]);
-
-    //         patchServices.unpatchCreatedElements();
-    //         expect(elementAfterPatch[testProperty]).toBe(element[testProperty]);
-    //     });
-    // });
     describe('patchExistingElements()', function() {
         it('should patch existing elements to protect from manipulation', function() {
             var testElement = document.createElement('div');
