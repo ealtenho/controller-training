@@ -1,35 +1,21 @@
 html, body {
   position:relative;
   height:100%;
+  width: 100%;
 }
 
 body {
   padding-bottom: 70px;
 }
 /**
-* Intro page
-*/
-.introQuestion {
-  margin-top: 6%;
+Button
+**/
+#trainingWheels {
+  margin-top: 10% !important;
+  margin-right: auto !important;
+  margin-left: auto !important;
+  width: 100%;
 }
-
-/**
-* Visual progress indicator, progress bar
-*/
-
-.angularProgress {
-  height: 15px !important;
-  margin: 5px !important;
-}
-
-.progressFirst {
-  width: 33% !important;
-}
-
-.progressSecond {
-  width: 66% !important;
-}
-
 
 /**
 * Style for breadcrumbs footer links
