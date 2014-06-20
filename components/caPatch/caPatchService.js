@@ -29,6 +29,7 @@ patchServices.originalProperties = {
   'Element': patchServices.collectPrototypeProperties(Element),
   'Node': patchServices.collectPrototypeProperties(Node),
   'EventTarget': patchServices.collectPrototypeProperties(EventTarget),
+  'Document': patchServices.collectPrototypeProperties(Document),
   'DocumentCreate': document['createElement']
 };
 
@@ -179,6 +180,7 @@ patchServices.addManipulationListener = function(listener) {
   patchServices.patchOnePrototype(Element, listener);
   patchServices.patchOnePrototype(Node, listener);
   patchServices.patchOnePrototype(EventTarget, listener);
+  patchServices.patchOnePrototype(Document, listener);
   patchServices.patchElementsOnCreation(listener);
 };
 
@@ -192,6 +194,7 @@ patchServices.removeManipulationListener = function() {
   patchServices.unpatchOnePrototype(Element, 'Element');
   patchServices.unpatchOnePrototype(Node, 'Node');
   patchServices.unpatchOnePrototype(EventTarget, 'EventTarget');
+  patchServices.unpatchOnePrototype(Document, 'Document');
   patchServices.unpatchCreatedElements();
 };
 

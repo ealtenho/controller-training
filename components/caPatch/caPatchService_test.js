@@ -84,6 +84,17 @@ describe('patchServices', function() {
       });
 
 
+      it('should patch the functions of Document.prototype', function() {
+        var objectProperties = Object.getOwnPropertyNames(Document.prototype);
+        var testProperty = objectProperties[0];
+        var originalFunction = Document.prototype[testProperty];
+        expect(Document.prototype[testProperty]).toBe(originalFunction);
+        patchServices.addManipulationListener();
+        expect(Document.prototype[testProperty]).not.toBe(originalFunction);
+        patchServices.removeManipulationListener();
+      });
+
+
       it('should patch the prototype functions to call the listener param', function() {
         var testFunctionObject = {};
         testFunctionObject.testingFunction = function(){
