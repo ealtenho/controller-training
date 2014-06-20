@@ -17,3 +17,19 @@ The implementation of controller-training has two pieces.
 1. First, a service patches all relevant DOM APIs in order to throw the error message indicating controller manipulation. This is accomplished by patching the prototypes of `Element`, `Node`, and `EventTarget` with the function as well as patching the properties of individual elements when they are created using the `document.create()` method.
 
 2. Second, the service is used to decorate the `$controller` service of AngularJS. Hence, when a controller is used, the controller-training service is called as well. To handle asynchronous uses of `$controller`, the `zone.js` library is used to create a zone for that interaction with the controller.
+
+[License](LICENSE)
+------------------
+Copyright 2014 Google, Inc. http://angularjs.org
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
