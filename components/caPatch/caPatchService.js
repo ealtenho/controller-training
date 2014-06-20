@@ -82,6 +82,12 @@ patchServices.unpatchOnePrototype = function(type, typeName) {
 };
 
 /**
+* Object to hold properties that will be patched to return them
+* to original state after patching.
+**/
+patchServices.savedElements = {};
+
+/**
 * Helper method to force patching of individual HTML elements on
 * creation. Any use of document.create is patched to create a version
 * of the element using patchServices.patchElementProperties.
@@ -90,7 +96,9 @@ patchServices.unpatchOnePrototype = function(type, typeName) {
 patchServices.patchElementsOnCreation = function(listener) {
   var unpatched = patchServices.originalProperties['DocumentCreate'];
   document['createElement'] = function(param) {
-    return patchServices.patchElementProperties(unpatched.apply(this,arguments), listener);
+    var original = unpatched.apply(this, arguments);
+    patchServices[original] = original;
+    return patchServices.patchElementProperties(original, listener);
   }
 };
 
@@ -101,11 +109,6 @@ patchServices.patchElementsOnCreation = function(listener) {
 **/
 patchServices.propertiesToPatch = ['innerHTML', 'parentElement'];
 
-/**
-* Object to hold properties that will be patched to return them
-* to original state after patching.
-**/
-patchServices.savedProperties = {};
 
 /**
 * Array for unpatched version of elements
@@ -125,7 +128,7 @@ patchServices.saveProp = function(element, prop) {
 **/
 patchServices.patchElementProperties = function(element, listener) {
   patchServices.propertiesToPatch.forEach(function(prop) {
-      patchServices.saveProp(element, prop);
+      //patchServices.saveProp(element, prop);
       Object.defineProperty(element, prop, {
         configurable: true,
         get: function() {
@@ -150,19 +153,19 @@ patchServices.patchElementProperties = function(element, listener) {
 patchServices.unpatchCreatedElements = function() {
   document['createElement'] = patchServices.originalProperties['DocumentCreate'];
   patchServices.patchedElements.forEach(function(elem) {
-    patchServices.unpatchElementProperties(elem);
+    patchServices.unpatchElementProperties(elem, patchServices.savedElements[elem]);
   });
 };
 
 /**
 * Helper function to unpatch all properties of a given element
 */
-patchServices.unpatchElementProperties = function(element) {
+patchServices.unpatchElementProperties = function(element, originalElement) {
   patchServices.propertiesToPatch.forEach(function(prop) {
   Object.defineProperty(element, prop, {
         configurable: true,
         get: function() {
-          return patchServices.savedProperties[prop];
+          return originalElement[prop];
         },
         set: function(newValue) {
           element.prop = newValue;
@@ -171,17 +174,43 @@ patchServices.unpatchElementProperties = function(element) {
   });
 };
 
+patchServices.savedExisting = {};
+patchServices.save = function(element, index) {
+  elementProperties = {};
+  patchServices.propertiesToPatch.forEach(function(prop) {
+    elementProperties[prop] = element[prop];
+  });
+  patchServices.savedExisting[index] = elementProperties;
+};
+
+patchServices.patchExistingElements = function(listener) {
+  elements = document.getElementsByTagName('*');
+  for(var i = 0; i < elements.length; i++) {
+    patchServices.save(elements[i], i);
+    patchServices.patchElementProperties(elements[i], listener);
+  }
+};
+
+patchServices.unpatchExistingElements = function() {
+  elements = document.getElementsByTagName('*');
+  for(var i = 0; i < elements.length; i++) {
+    var originalElement = patchServices.savedExisting[i];
+    patchServices.unpatchElementProperties(elements[i], originalElement);
+  }
+};
+
 /**
 * Controls the patching process by patching all necessary
 * prototypes as well as triggering the patching of individual
 * HTML elements.
 **/
 patchServices.addManipulationListener = function(listener) {
+  patchServices.patchExistingElements(listener);
   patchServices.patchOnePrototype(Element, listener);
   patchServices.patchOnePrototype(Node, listener);
   patchServices.patchOnePrototype(EventTarget, listener);
   patchServices.patchOnePrototype(Document, listener);
-  patchServices.patchElementsOnCreation(listener);
+  //patchServices.patchElementsOnCreation(listener);
 };
 
 /**
@@ -195,7 +224,8 @@ patchServices.removeManipulationListener = function() {
   patchServices.unpatchOnePrototype(Node, 'Node');
   patchServices.unpatchOnePrototype(EventTarget, 'EventTarget');
   patchServices.unpatchOnePrototype(Document, 'Document');
-  patchServices.unpatchCreatedElements();
+  //patchServices.unpatchCreatedElements();
+  patchServices.unpatchExistingElements();
 };
 
 /**
