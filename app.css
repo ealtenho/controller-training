@@ -17,6 +17,12 @@ Button
   width: 100%;
 }
 
+#remove {
+  margin-top: 10%;
+  background-color: red;
+  color: white;
+}
+
 /**
 * Style for breadcrumbs footer links
 */

@@ -1,8 +1,31 @@
+<!-- These are examples of where controller trainer can be helpful. The first implementation of each number violates Angular's best practices. Look for the corresponding number
+in app-controller.js to see why. The second implementation uses Angular techniques to separate the manipulation of the DOM from the controller. -->
+
+<!-- 1. DOM manipulation method of changing button text -->
 <button id="trainingWheels" class="text-center">I'm ready to take off my training wheels!</button>
 
-<!-- <button ng-click="sampleAppCtrl.clicked = true" ng-show="sampleAppCtrl.clicked == false" id="trainingWheels" class="text-center">I'm ready to take off my training wheels!</button>
+<!-- 1. Angular method of changing button text -->
 
+<!--  <button ng-click="sampleAppCtrl.clicked = true" ng-show="sampleAppCtrl.clicked == false" id="trainingWheels" class="text-center">I'm ready to take off my training wheels!</button>
 <div ng-show="sampleAppCtrl.clicked == true" id="trainingWheels" class="text-center">
   <p>Training Wheels Off!</p>
   <button ng-click="sampleAppCtrl.clicked = false">Revert</button>
-</div> -->
+</div>
+ -->
+
+<!-- 2. DOM manipulation method of adding dynamic elements -->
+<div id="bicycles"></div>
+
+<!-- 2. Angular method of adding dynamic elements -->
+<!--
+<div id="bicycles" ng-repeat="bike in sampleAppCtrl.bicycles">{{bike}}</div>
+-->
+
+<!-- 3. DOM Manipulation method of removing an element -->
+<div id="remove">Removed after 30 seconds.</div>
+
+<!-- 3. Angular method of removing an element -->
+<div ng-controller="SampleAppController">
+  {{removeTime}}
+  <div ng-show="removeTime != true" id="remove">Removed after 30 seconds.</div>
+</div>
