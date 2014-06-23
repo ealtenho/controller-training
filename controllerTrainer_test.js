@@ -55,5 +55,20 @@ describe('controller training application', function() {
       var ctrl = $controller(controllerMock);
       expect(patchServices.unpatchOnePrototype).toHaveBeenCalled();
     });
+
+
+    it('should patch methods on the controller instance', function() {
+      spyOn(patchServices, 'listener');
+      expect(patchServices.listener).not.toHaveBeenCalled();
+      var controllerMock = function() {
+        this.someMethod = function () {
+          var element = document.createElement('a');
+          element.innerHTML = 'testValue';
+        };
+      };
+      var ctrl = $controller(controllerMock);
+      ctrl.someMethod();
+      expect(patchServices.listener).toHaveBeenCalled();
+    });
   });
 });
