@@ -24,7 +24,7 @@ Examples
 The `sampleApp` contained in this repository has examples of controller manipulation that violate best practice and will cause errors if the controllerTrainer module is loaded. The sample also contains correct Angular implementations that do not violate best practices and accomplish the same goals.
 
 Use
-____________
+------------
 
 Injecting the `controllerTrainer` module in an application's central module will enable its features if the files are also present.
 
