@@ -14,9 +14,19 @@ Implementation
 
 The implementation of controller-training has two pieces.
 
-1. First, a service patches all relevant DOM APIs in order to throw the error message indicating controller manipulation. This is accomplished by patching the prototypes of `Element`, `Node`, and `EventTarget` with the function as well as patching the properties of individual elements when they are created using the `document.create()` method.
+1. First, a service patches all relevant DOM APIs in order to throw the error message indicating controller manipulation. This is accomplished by patching the prototypes of `Element`, `Node`, and `EventTarget` and `Document` with the function as well as patching the properties of individual elements on the page.
 
 2. Second, the service is used to decorate the `$controller` service of AngularJS. Hence, when a controller is used, the controller-training service is called as well. To handle asynchronous uses of `$controller`, the `zone.js` library is used to create a zone for that interaction with the controller.
+
+Examples
+-------------
+
+The `sampleApp` contained in this repository has examples of controller manipulation that violate best practice and will cause errors if the controllerTrainer module is loaded. The sample also contains correct Angular implementations that do not violate best practices and accomplish the same goals.
+
+Use
+____________
+
+Injecting the `controllerTrainer` module in an application's central module will enable its features if the files are also present.
 
 [License](LICENSE)
 ------------------
