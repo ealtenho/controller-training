@@ -54,26 +54,31 @@ describe('Asynchronous controller execution detection', function(){
     var originalFunctionDocument = Document.prototype[testProperty];
     expect(Element.prototype[testProperty]).toBe(originalFunction);
     var elem = document.createElement('div');
+    elem.setAttribute('id', 'testElement');
+    document.body.appendChild(elem);
         runs(function() {
           spyOn(patchServices, 'listener');
           var controllerMock = function($timeout) {
               $timeout(function() {
-                var element = document.createElement('a');
+                var element = document.getElementById('testElement');
                 element.getAttribute('id');
                 timeoutCompleted = true;
               }, 0);
             };
           try{
-          elem.getAttribute('id');
+          var element = document.getElementById('testElement');
+          element.getAttribute('id');
           var ctrl = $controller(controllerMock);
           }
           catch(e){
             console.log('Caught an error making controller: ' + e);
           }
-          elem.getAttribute('id');
+          var element = document.getElementById('testElement');
+          element.getAttribute('id');
         });
 
         waitsFor(function() {
+          elem = document.getElementById('testElement');
           elem.getAttribute('id');
           return timeoutCompleted;
         }, 'controller execution', 100);
@@ -86,5 +91,47 @@ describe('Asynchronous controller execution detection', function(){
           expect(Document.prototype[testProperty]).toBe(originalFunctionDocument);
           expect(patchServices.listener.callCount).toBe(2);
         });
+  }));
+  iit('should use zone.js to enter and exit at the right times', inject(function($rootScope) {
+    var timeoutCompleted = false;
+    runs(function() {
+      var testZone = zone.fork(Zone.longStackTraceZone).fork({
+        beforeTask: function() {
+          console.log('before');
+          patchServices.addManipulationListener();
+        },
+        afterTask: function() {
+          console.log('after');
+          patchServices.removeManipulationListener();
+        }
+      });
+      var ctrlFunction = function() {
+        var controllerMock = function($timeout) {
+          $timeout(function() {
+          //document.createElement('test');
+          $scope.value = 'new value';
+          timeoutCompleted = true;
+          }, 0);
+        };
+        document.createElement('test1');
+        var myScope = $rootScope.$new();
+        var ctrl = $controller(controllerMock, {$scope: myScope});
+        ctrl.testAttribute = 'testAttribute';
+        console.log(ctrl.testAttribute);
+        document.createElement('test2');
+      };
+      testZone.bind(ctrlFunction);
+      document.createElement('test3');
+      ctrlFunction();
+      document.createElement('test4');
+      ctrlFunction();
+  });
+    waitsFor(function() {
+      document.createElement('test');
+      return timeoutCompleted;
+    }, 'controller execution', 100);
+    runs(function() {
+      document.createElement('test5');
+    });
   }));
 });
