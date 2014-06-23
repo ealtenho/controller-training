@@ -92,8 +92,9 @@ describe('Asynchronous controller execution detection', function(){
           expect(patchServices.listener.callCount).toBe(2);
         });
   }));
-  iit('should use zone.js to enter and exit at the right times', inject(function($rootScope) {
+  it('should use zone.js to enter and exit at the right times', inject(function($rootScope) {
     var timeoutCompleted = false;
+    spyOn(patchServices, 'listener');
     runs(function() {
       var testZone = zone.fork(Zone.longStackTraceZone).fork({
         beforeTask: function() {
@@ -108,8 +109,7 @@ describe('Asynchronous controller execution detection', function(){
       var ctrlFunction = function() {
         var controllerMock = function($timeout) {
           $timeout(function() {
-          //document.createElement('test');
-          $scope.value = 'new value';
+          document.createElement('test');
           timeoutCompleted = true;
           }, 0);
         };
@@ -123,15 +123,13 @@ describe('Asynchronous controller execution detection', function(){
       testZone.bind(ctrlFunction);
       document.createElement('test3');
       ctrlFunction();
-      document.createElement('test4');
-      ctrlFunction();
   });
     waitsFor(function() {
       document.createElement('test');
       return timeoutCompleted;
     }, 'controller execution', 100);
     runs(function() {
-      document.createElement('test5');
+      expect(patchServices.listener.callCount).toBe(1);
     });
   }));
 });
