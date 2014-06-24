@@ -23,25 +23,34 @@ angular.module('controllerTrainer', []).
           patchServices.removeManipulationListener();
         }
       });
+
+      var patchedServices = {};
+
       return function(ctrl, locals) {
 
-        // patch methods on $scope
-        if (locals) {
-          if (locals.$scope) {
-            Object.keys(locals.$scope).forEach(function (prop) {
-              if (prop[0] !== '$' && typeof locals.$scope[prop] === 'function') {
-                locals.$scope[prop] = controllerZone.bind(locals.$scope[prop]);
-              }
-            });
-          }
-          if (locals.$timeout) {
+        var dependencies = $injector.annotate(ctrl);
 
-          }
+
+        // patch methods on $scope
+        if (!locals) {
+          locals = {};
+        }
+        if (locals.$scope) {
+          Object.keys(locals.$scope).forEach(function (prop) {
+            if (prop[0] !== '$' && typeof locals.$scope[prop] === 'function') {
+              locals.$scope[prop] = controllerZone.bind(locals.$scope[prop]);
+            }
+          });
+        }
+        if (dependencies.indexOf('$timeout') > -1) {
+          locals.$timeout = patchedServices.$timeout =
+              (patchedServices.$timeout || controllerZone.bind($injector.get('$timeout')));
         }
 
         // body of controller
         patchServices.addManipulationListener();
-        var ctrlInstance = $delegate.apply(this, arguments);
+
+        var ctrlInstance = $delegate.apply(this, [ctrl, locals]);
         patchServices.removeManipulationListener();
 
         // controller.test
